@@ -12,6 +12,8 @@ import com.agrilink.mapper.UserMapper;
 import com.agrilink.repository.OTPRepository;
 import com.agrilink.repository.UserRepository;
 import com.agrilink.response.ApiResponse;
+import com.agrilink.dto.EmailRequest;
+import com.agrilink.service.EmailService;
 import com.agrilink.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,6 +38,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtTokenProvider tokenProvider;
     private final OTPRepository otpRepository;
     private final UserMapper userMapper;
+    private final EmailService emailService;
 
     @Override
     public ApiResponse<JwtAuthenticationResponse> login(LoginRequest request) {
@@ -133,8 +136,17 @@ public class AuthServiceImpl implements AuthService {
         otpRepository.deleteByTarget(request.getTarget());
         otpRepository.save(otpVerification);
 
-        // TODO: Integrate actual email/SMS sender here based on user preference
-        System.out.println("OTP for " + request.getTarget() + " is: " + otp);
+        // Send real email OTP via SMTP
+        try {
+            emailService.sendEmail(EmailRequest.builder()
+                    .to(request.getTarget())
+                    .subject("AgriLink Email Verification OTP")
+                    .body("Your OTP for AgriLink verification is: " + otp + "\n\nThis OTP is valid for 10 minutes.")
+                    .build());
+            System.out.println("Real OTP email sent to: " + request.getTarget());
+        } catch (Exception e) {
+            System.err.println("Failed to send real SMTP OTP email: " + e.getMessage());
+        }
 
         return ApiResponse.success("OTP sent successfully", null);
     }

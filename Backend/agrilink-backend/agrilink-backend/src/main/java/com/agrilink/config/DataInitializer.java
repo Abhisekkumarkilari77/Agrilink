@@ -72,7 +72,22 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println("Default Farmer user created: farmer@agrilink.com / farmer123");
         }
 
-        // 4. Seed Categories if empty
+        // 4. Create Sample Delivery Partner user if not present
+        if (!userRepository.existsByEmail("delivery@agrilink.com")) {
+            User delivery = User.builder()
+                    .name("Ravi Kumar")
+                    .email("delivery@agrilink.com")
+                    .mobile("9876543213")
+                    .password(passwordEncoder.encode("delivery123"))
+                    .role(RoleType.DELIVERY)
+                    .status(AccountStatus.ACTIVE)
+                    .vehicleNumber("KA-01-EF-4567")
+                    .build();
+            userRepository.save(delivery);
+            System.out.println("Default Delivery partner user created: delivery@agrilink.com / delivery123");
+        }
+
+        // 5. Seed Categories if empty
         if (categoryRepository.count() == 0) {
             List<Category> categories = Arrays.asList(
                     Category.builder().name("Vegetables").description("Fresh chemical-free farm vegetables").build(),
@@ -86,7 +101,7 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println("Sample Categories seeded into MongoDB");
         }
 
-        // 5. Seed Sample Products if empty
+        // 6. Seed Sample Products if empty
         if (productRepository.count() == 0) {
             String farmerId = farmer.getId();
             List<Product> sampleProducts = Arrays.asList(
