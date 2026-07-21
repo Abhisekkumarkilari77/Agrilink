@@ -21,6 +21,11 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(request));
     }
 
+    @GetMapping({"/me", "/profile"})
+    public ResponseEntity<ApiResponse<User>> getCurrentUser() {
+        return ResponseEntity.ok(authService.getCurrentUser());
+    }
+
     @PostMapping("/register/customer")
     public ResponseEntity<ApiResponse<User>> registerCustomer(@Valid @RequestBody CustomerRegisterRequest request) {
         return ResponseEntity.ok(authService.registerCustomer(request));

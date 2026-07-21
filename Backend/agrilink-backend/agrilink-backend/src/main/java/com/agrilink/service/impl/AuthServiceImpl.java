@@ -12,6 +12,8 @@ import com.agrilink.mapper.UserMapper;
 import com.agrilink.repository.OTPRepository;
 import com.agrilink.repository.UserRepository;
 import com.agrilink.response.ApiResponse;
+import com.agrilink.security.CustomUserDetails;
+import com.agrilink.exception.UnauthorizedException;
 import com.agrilink.dto.EmailRequest;
 import com.agrilink.service.EmailService;
 import com.agrilink.service.AuthService;
@@ -208,6 +210,18 @@ public class AuthServiceImpl implements AuthService {
         }
 
         throw new BadRequestException("Invalid OTP. Enter 123456 for test verification.");
+    }
+
+    @Override
+    public ApiResponse<User> getCurrentUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof CustomUserDetails) {
+            String userId = ((CustomUserDetails) principal).getId();
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+            return ApiResponse.success("User fetched successfully", user);
+        }
+        throw new UnauthorizedException("User is not authenticated");
     }
 
     @Override

@@ -14,3 +14,7 @@ target/
 # OS artifacts
 .DS_Store
 Thumbs.db
+
+# Database files
+mongo_data/
+*.lock

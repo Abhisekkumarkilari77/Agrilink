@@ -103,6 +103,41 @@ export const adminService = {
     return response.data.data || response.data;
   },
 
+  approveUser: async (id) => {
+    if (MOCK_MODE) {
+      await new Promise(resolve => setTimeout(resolve, 400));
+      const users = JSON.parse(localStorage.getItem('agrilink_mock_users') || '[]');
+      const idx = users.findIndex(u => u.id === id);
+      if (idx !== -1) {
+        users[idx].status = 'APPROVED';
+        localStorage.setItem('agrilink_mock_users', JSON.stringify(users));
+        return { message: 'User approved' };
+      }
+      throw new Error('User not found');
+    }
+    const response = await axiosInstance.put(`/admin/users/${id}/approve`);
+    return response.data.data || response.data;
+  },
+
+  rejectUser: async (id, reason) => {
+    if (MOCK_MODE) {
+      await new Promise(resolve => setTimeout(resolve, 400));
+      const users = JSON.parse(localStorage.getItem('agrilink_mock_users') || '[]');
+      const idx = users.findIndex(u => u.id === id);
+      if (idx !== -1) {
+        users[idx].status = 'REJECTED';
+        users[idx].rejectReason = reason;
+        localStorage.setItem('agrilink_mock_users', JSON.stringify(users));
+        return { message: 'User rejected' };
+      }
+      throw new Error('User not found');
+    }
+    const response = await axiosInstance.put(`/admin/users/${id}/reject`, null, {
+      params: { reason }
+    });
+    return response.data.data || response.data;
+  },
+
   deleteUser: async (id) => {
     if (MOCK_MODE) {
       await new Promise(resolve => setTimeout(resolve, 500));

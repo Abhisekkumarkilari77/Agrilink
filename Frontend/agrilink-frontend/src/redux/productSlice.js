@@ -8,5 +8,4 @@ const productSlice = createSlice({
   reducers: {}
 });
 
-export const {} = productSlice.actions;
 export default productSlice.reducer;

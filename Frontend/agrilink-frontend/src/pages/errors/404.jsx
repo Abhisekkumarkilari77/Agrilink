@@ -1,6 +1,6 @@
 import React from 'react';
 
-const 404 = () => {
+const NotFound = () => {
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold">404 Component</h2>
@@ -8,4 +8,4 @@ const 404 = () => {
   );
 };
 
-export default 404;
+export default NotFound;

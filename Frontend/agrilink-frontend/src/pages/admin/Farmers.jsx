@@ -24,14 +24,9 @@ const Farmers = () => {
 
   const handleApprove = async (id) => {
     try {
-      const users = JSON.parse(localStorage.getItem('agrilink_mock_users') || '[]');
-      const idx = users.findIndex(u => u.id === id);
-      if (idx !== -1) {
-        users[idx].status = 'APPROVED';
-        localStorage.setItem('agrilink_mock_users', JSON.stringify(users));
-        setMessage('Farmer approved and dashboard activated.');
-        fetchFarmers();
-      }
+      await adminService.approveUser(id);
+      setMessage('Farmer approved and dashboard activated.');
+      fetchFarmers();
     } catch (err) {
       alert('Verification failed.');
     }
@@ -41,15 +36,9 @@ const Farmers = () => {
     const reason = window.prompt('Provide rejection reason (Incorrect documents / Location mismatch):');
     if (reason) {
       try {
-        const users = JSON.parse(localStorage.getItem('agrilink_mock_users') || '[]');
-        const idx = users.findIndex(u => u.id === id);
-        if (idx !== -1) {
-          users[idx].status = 'REJECTED';
-          users[idx].rejectReason = reason;
-          localStorage.setItem('agrilink_mock_users', JSON.stringify(users));
-          setMessage('Farmer registration rejected.');
-          fetchFarmers();
-        }
+        await adminService.rejectUser(id, reason);
+        setMessage('Farmer registration rejected.');
+        fetchFarmers();
       } catch (err) {
         alert('Rejection failed.');
       }

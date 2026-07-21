@@ -8,5 +8,4 @@ const farmerSlice = createSlice({
   reducers: {}
 });
 
-export const {} = farmerSlice.actions;
 export default farmerSlice.reducer;

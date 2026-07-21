@@ -24,14 +24,9 @@ const DeliveryPartners = () => {
 
   const handleApprove = async (id) => {
     try {
-      const users = JSON.parse(localStorage.getItem('agrilink_mock_users') || '[]');
-      const idx = users.findIndex(u => u.id === id);
-      if (idx !== -1) {
-        users[idx].status = 'APPROVED';
-        localStorage.setItem('agrilink_mock_users', JSON.stringify(users));
-        setMessage('Delivery partner verified successfully.');
-        fetchPartners();
-      }
+      await adminService.approveUser(id);
+      setMessage('Delivery partner verified successfully.');
+      fetchPartners();
     } catch (err) {
       alert('Verification failed.');
     }
@@ -41,15 +36,9 @@ const DeliveryPartners = () => {
     const reason = window.prompt('Provide rejection reason (Duplicate / Incorrect DL):');
     if (reason) {
       try {
-        const users = JSON.parse(localStorage.getItem('agrilink_mock_users') || '[]');
-        const idx = users.findIndex(u => u.id === id);
-        if (idx !== -1) {
-          users[idx].status = 'REJECTED';
-          users[idx].rejectReason = reason;
-          localStorage.setItem('agrilink_mock_users', JSON.stringify(users));
-          setMessage('Partner registration rejected.');
-          fetchPartners();
-        }
+        await adminService.rejectUser(id, reason);
+        setMessage('Partner registration rejected.');
+        fetchPartners();
       } catch (err) {
         alert('Rejection failed.');
       }

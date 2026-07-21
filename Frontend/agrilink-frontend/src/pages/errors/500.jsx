@@ -1,6 +1,6 @@
 import React from 'react';
 
-const 500 = () => {
+const ServerError = () => {
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold">500 Component</h2>
@@ -8,4 +8,4 @@ const 500 = () => {
   );
 };
 
-export default 500;
+export default ServerError;

@@ -121,6 +121,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const checkStatus = async () => {
+    try {
+      const updatedUser = await authService.getCurrentUser();
+      if (updatedUser) {
+        setUser(updatedUser);
+        localStorage.setItem('agrilink_user', JSON.stringify(updatedUser));
+        return updatedUser;
+      }
+    } catch (err) {
+      console.error("Failed to check status:", err);
+    }
+    return null;
+  };
+
   const value = {
     user,
     token,
@@ -133,6 +147,7 @@ export const AuthProvider = ({ children }) => {
     verifyOTP,
     requestPasswordReset,
     completePasswordReset,
+    checkStatus,
     setError
   };
 

@@ -16,9 +16,9 @@ const Login = () => {
     if (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') {
       navigate('/admin/dashboard', { replace: true });
     } else if (user.role === 'FARMER') {
-      navigate(user.status === 'APPROVED' ? '/farmer/dashboard' : '/pending-verification', { replace: true });
+      navigate((user.status === 'APPROVED' || user.status === 'ACTIVE') ? '/farmer/dashboard' : '/pending-verification', { replace: true });
     } else if (user.role === 'DELIVERY') {
-      navigate(user.status === 'APPROVED' ? '/delivery/dashboard' : '/pending-verification', { replace: true });
+      navigate((user.status === 'APPROVED' || user.status === 'ACTIVE') ? '/delivery/dashboard' : '/pending-verification', { replace: true });
     } else {
       navigate('/customer/dashboard', { replace: true });
     }

@@ -1,8 +1,43 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 
 const PendingVerification = () => {
-  const { user, logout } = useAuth();
+  const { user, checkStatus, logout } = useAuth();
+  const navigate = useNavigate();
+  const [checking, setChecking] = useState(false);
+
+  const handleCheckStatus = async () => {
+    setChecking(true);
+    const updated = await checkStatus();
+    setChecking(false);
+    if (updated && (updated.status === 'ACTIVE' || updated.status === 'APPROVED')) {
+      if (updated.role === 'FARMER') {
+        navigate('/farmer/dashboard');
+      } else if (updated.role === 'DELIVERY') {
+        navigate('/delivery/dashboard');
+      }
+    }
+  };
+
+  useEffect(() => {
+    // Initial check on mount
+    handleCheckStatus();
+
+    // Check status every 10 seconds automatically
+    const interval = setInterval(async () => {
+      const updated = await checkStatus();
+      if (updated && (updated.status === 'ACTIVE' || updated.status === 'APPROVED')) {
+        if (updated.role === 'FARMER') {
+          navigate('/farmer/dashboard');
+        } else if (updated.role === 'DELIVERY') {
+          navigate('/delivery/dashboard');
+        }
+      }
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-4">
@@ -20,12 +55,23 @@ const PendingVerification = () => {
           <p className="font-semibold mb-1">Status: Pending Admin Review</p>
           <p>Our admins are verifying your documents. We will notify you once your account is activated. Usually takes 24-48 hours.</p>
         </div>
-        <button
-          onClick={logout}
-          className="w-full bg-gray-150 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 px-4 rounded-xl transition duration-150 ease-in-out border border-gray-300"
-        >
-          Logout & Return to Login
-        </button>
+        
+        <div className="space-y-3">
+          <button
+            onClick={handleCheckStatus}
+            disabled={checking}
+            className="w-full bg-primary hover:bg-primary/95 text-white font-semibold py-2.5 px-4 rounded-xl transition duration-150 ease-in-out disabled:opacity-50"
+          >
+            {checking ? 'Checking Status...' : 'Check Status Now'}
+          </button>
+          
+          <button
+            onClick={logout}
+            className="w-full bg-gray-150 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 px-4 rounded-xl transition duration-150 ease-in-out border border-gray-300"
+          >
+            Logout & Return to Login
+          </button>
+        </div>
       </div>
     </div>
   );

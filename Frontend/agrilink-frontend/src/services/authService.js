@@ -201,6 +201,15 @@ export const authService = {
     return response.data.data || response.data;
   },
 
+  getCurrentUser: async () => {
+    if (MOCK_MODE) {
+      const savedUser = localStorage.getItem('agrilink_user');
+      return savedUser ? JSON.parse(savedUser) : null;
+    }
+    const response = await axiosInstance.get(API_ENDPOINTS.PROFILE);
+    return response.data.data || response.data;
+  },
+
   // Admin Operations
   getPendingUsers: async () => {
     if (MOCK_MODE) {

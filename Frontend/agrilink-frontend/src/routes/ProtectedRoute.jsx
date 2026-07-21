@@ -32,7 +32,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   }
 
   // If already APPROVED/ACTIVE but trying to access the pending page, redirect to their dashboard
-  if (user?.status === 'APPROVED' && location.pathname === '/pending-verification') {
+  if ((user?.status === 'APPROVED' || user?.status === 'ACTIVE') && location.pathname === '/pending-verification') {
     const dashboardRedirects = {
       FARMER: '/farmer/dashboard',
       DELIVERY: '/delivery/dashboard',
