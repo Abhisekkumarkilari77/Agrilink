@@ -155,6 +155,7 @@ public class AuthServiceImpl implements AuthService {
             System.out.println("Real OTP email sent to: " + request.getTarget());
         } catch (Exception e) {
             System.err.println("Failed to send real SMTP OTP email: " + e.getMessage());
+            e.printStackTrace();
         }
 
         return ApiResponse.success("OTP sent successfully", null);
