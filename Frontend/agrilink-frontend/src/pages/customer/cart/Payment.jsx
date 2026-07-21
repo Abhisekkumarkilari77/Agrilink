@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import orderService from '../../../services/orderService';
+import { paymentService } from '../../../services/paymentService';
 import { useCart } from '../../../context/CartContext';
 
 const Payment = () => {
@@ -40,6 +41,7 @@ const Payment = () => {
 
     setLoading(true);
     try {
+      // 1. Create Order
       const order = await orderService.createOrder({
         items: details.items,
         address: details.address,
@@ -47,11 +49,27 @@ const Payment = () => {
         paymentMethod: details.paymentMethod,
         total: details.total
       });
+
+      // 2. Initiate Payment Transaction
+      const transactionId = 'TXN' + Math.floor(100000 + Math.random() * 900000);
+      const payment = await paymentService.initiatePayment({
+        orderId: order.id,
+        amount: details.total,
+        method: details.paymentMethod,
+        transactionId: transactionId
+      });
+
+      // 3. Mark online payment as SUCCESS to transition order to CONFIRMED
+      if (details.paymentMethod !== 'COD') {
+        await paymentService.updatePaymentStatus(payment.id, 'SUCCESS');
+      }
+
       clearCart();
       sessionStorage.removeItem('agrilink_checkout_details');
       sessionStorage.setItem('agrilink_last_order', JSON.stringify(order));
       navigate('/customer/order-success');
     } catch (err) {
+      console.error(err);
       setError('Payment transaction failed. Please check inputs.');
     } finally {
       setLoading(false);

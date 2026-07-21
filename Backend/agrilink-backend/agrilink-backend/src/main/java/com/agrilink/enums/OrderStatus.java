@@ -12,5 +12,8 @@ public enum OrderStatus {
     OUT_FOR_DELIVERY,
     DELIVERED,
     CANCELLED,
-    REJECTED
+    REJECTED,
+    ORDER_PLACED,
+    FARMER_ACCEPTED,
+    DELIVERY_ACCEPTED
 }

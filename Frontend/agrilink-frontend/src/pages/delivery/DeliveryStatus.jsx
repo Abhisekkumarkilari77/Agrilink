@@ -7,16 +7,19 @@ const DeliveryStatus = () => {
   const navigate = useNavigate();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [otp, setOtp] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('COD');
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
   const loadOrder = async () => {
     try {
-      const list = await deliveryService.getAssignedOrders();
+      const list = await deliveryService.getMyDeliveries();
       const found = list.find(o => o.id === id);
       if (found) {
         setOrder(found);
+        if (found.paymentMethod) {
+          setPaymentMethod(found.paymentMethod);
+        }
       } else {
         setError('Order not found.');
       }
@@ -40,19 +43,19 @@ const DeliveryStatus = () => {
     }
   };
 
-  const handleVerifyDelivery = async (e) => {
+  const handleConfirmPayment = async (e) => {
     e.preventDefault();
     setError('');
     setMessage('');
 
     try {
-      await deliveryService.verifyDeliveryOtp(id, otp);
-      setMessage('OTP Verified! Delivery Completed successfully. Commission added.');
+      await deliveryService.confirmPayment(id, paymentMethod);
+      setMessage('Payment Confirmed! Delivery Completed successfully.');
       setTimeout(() => {
         navigate('/delivery/dashboard');
       }, 1500);
     } catch (err) {
-      setError(err.message || 'Verification failed.');
+      setError(err.message || 'Payment confirmation failed.');
     }
   };
 
@@ -75,6 +78,9 @@ const DeliveryStatus = () => {
     return <div className="text-center py-12 text-red-600 font-bold">{error || 'Order not found'}</div>;
   }
 
+  const itemsText = order.items ? order.items.map(item => item.name).join(', ') : 'N/A';
+  const quantityText = order.items ? order.items.map(item => `${item.quantity} kg`).join(' + ') : 'N/A';
+
   return (
     <div className="bg-white rounded-3xl border border-gray-150 p-8 max-w-xl mx-auto shadow-sm space-y-6">
       <div className="flex justify-between items-center border-b pb-4">
@@ -92,13 +98,13 @@ const DeliveryStatus = () => {
         <p className="uppercase text-gray-400 tracking-widest text-[10px] mb-2">Milestone Checklist</p>
         <div className="space-y-3">
           {[
-            { id: 'ACCEPTED', label: 'Accepted by partner' },
+            { id: 'DELIVERY_ACCEPTED', label: 'Accepted by partner' },
             { id: 'PICKED_UP', label: 'Crops Picked up from farmer' },
             { id: 'IN_TRANSIT', label: 'In Transit' },
-            { id: 'REACHED_CUSTOMER', label: 'Reached Customer Location' },
+            { id: 'OUT_FOR_DELIVERY', label: 'Out For Delivery' },
             { id: 'DELIVERED', label: 'Delivered' }
           ].map((stage, idx) => {
-            const list = ['ACCEPTED', 'PICKED_UP', 'IN_TRANSIT', 'REACHED_CUSTOMER', 'DELIVERED'];
+            const list = ['DELIVERY_ACCEPTED', 'PICKED_UP', 'IN_TRANSIT', 'OUT_FOR_DELIVERY', 'DELIVERED'];
             const currentIdx = list.indexOf(order.status);
             const stageIdx = list.indexOf(stage.id);
             const isDone = stageIdx <= currentIdx;
@@ -108,19 +114,37 @@ const DeliveryStatus = () => {
                 <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${isDone ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-400 border'}`}>
                   {isDone ? '✓' : idx + 1}
                 </div>
-                <span className={isDone ? 'text-gray-855 text-gray-800 font-bold' : 'text-gray-400'}>{stage.label}</span>
+                <span className={isDone ? 'text-gray-800 font-bold' : 'text-gray-400'}>{stage.label}</span>
               </div>
             );
           })}
         </div>
       </div>
 
+      {/* Farmer Info */}
+      <div className="p-4 border rounded-2xl bg-gray-50 text-xs space-y-1">
+        <p className="font-bold text-gray-800 text-sm">Farmer Info</p>
+        <p><span className="text-gray-400 font-semibold">Farmer Name:</span> <span className="font-semibold text-gray-700">{order.farmerName}</span></p>
+        <p><span className="text-gray-400 font-semibold">Mobile:</span> <span className="font-semibold text-gray-700">{order.farmerPhone || 'N/A'}</span></p>
+        <p><span className="text-gray-400 font-semibold">Pickup Address:</span> <span className="font-semibold text-gray-700">{order.farmerAddress || 'N/A'}</span></p>
+      </div>
+
       {/* Customer Info */}
       <div className="p-4 border rounded-2xl bg-gray-50 text-xs space-y-1">
         <p className="font-bold text-gray-800 text-sm">Customer Info</p>
         <p><span className="text-gray-400">Name:</span> <span className="font-semibold text-gray-700">{order.customerName}</span></p>
-        <p><span className="text-gray-400">Mobile:</span> <span className="font-semibold text-primary">{order.customerContact}</span></p>
-        <p><span className="text-gray-400">Address:</span> <span className="font-semibold text-gray-700">{order.deliveryAddress}</span></p>
+        <p><span className="text-gray-400">Mobile:</span> <span className="font-semibold text-primary">{order.customerPhone || 'N/A'}</span></p>
+        <p><span className="text-gray-400">Email:</span> <span className="font-semibold text-gray-700">{order.customerEmail || 'N/A'}</span></p>
+        <p><span className="text-gray-400">Delivery Address:</span> <span className="font-semibold text-gray-700">{order.address}</span></p>
+      </div>
+
+      {/* Package & Payment Info */}
+      <div className="p-4 border rounded-2xl bg-gray-50 text-xs space-y-1">
+        <p className="font-bold text-gray-800 text-sm">Package & Payment Details</p>
+        <p><span className="text-gray-400">Crops:</span> <span className="font-semibold text-gray-700">{itemsText}</span></p>
+        <p><span className="text-gray-400">Quantity:</span> <span className="font-semibold text-gray-700">{quantityText}</span></p>
+        <p><span className="text-gray-400">Total Amount:</span> <span className="font-semibold text-yellow-600">₹{order.total}</span></p>
+        <p><span className="text-gray-400">Prescribed Payment Mode:</span> <span className="font-semibold text-gray-700">{order.paymentMethod || 'Online'}</span></p>
       </div>
 
       {/* Control flows */}
@@ -136,27 +160,32 @@ const DeliveryStatus = () => {
 
         {order.status === 'IN_TRANSIT' && (
           <button
-            onClick={() => handleStatusChange('REACHED_CUSTOMER')}
+            onClick={() => handleStatusChange('OUT_FOR_DELIVERY')}
             className="w-full py-3 bg-yellow-500 hover:bg-yellow-600 text-white font-bold rounded-xl text-xs transition"
           >
-            Mark Reached Customer Location
+            Mark Out For Delivery
           </button>
         )}
 
-        {order.status === 'REACHED_CUSTOMER' && (
-          <form onSubmit={handleVerifyDelivery} className="p-5 border border-dashed rounded-2xl bg-green-50/10 space-y-4">
-            <p className="text-xs font-bold text-gray-700 text-center">Verify Customer Delivery OTP</p>
-            <input
-              type="text"
-              placeholder="6-digit OTP"
-              maxLength="6"
-              value={otp}
-              onChange={e => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
-              className="w-full text-center px-4 py-3 rounded-xl border border-gray-200 text-lg font-bold tracking-widest focus:outline-none focus:ring-2 focus:ring-green-500"
-              required
-            />
-            <button type="submit" className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-xs transition">
-              Verify & Complete Delivery
+        {order.status === 'OUT_FOR_DELIVERY' && (
+          <form onSubmit={handleConfirmPayment} className="p-5 border border-dashed rounded-2xl bg-green-50/10 space-y-4">
+            <p className="text-xs font-bold text-gray-700 text-center">Verify Payment Collection</p>
+            <div className="space-y-2">
+              <label className="block text-[10px] text-gray-450 uppercase font-bold">Select Active Payment Method</label>
+              <select
+                value={paymentMethod}
+                onChange={e => setPaymentMethod(e.target.value)}
+                className="w-full px-3 py-2 border rounded-xl bg-white text-xs font-bold focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option value="COD">Cash on Delivery (COD)</option>
+                <option value="UPI">UPI Payment</option>
+                <option value="CARD">Credit / Debit Card</option>
+                <option value="NET_BANKING">Net Banking</option>
+                <option value="WALLET">Wallet</option>
+              </select>
+            </div>
+            <button type="submit" className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-xs transition shadow-md">
+              Confirm Payment Successful & Complete Delivery
             </button>
           </form>
         )}
@@ -169,12 +198,6 @@ const DeliveryStatus = () => {
             Assigned Orders
           </button>
         </div>
-
-        {order.status === 'REACHED_CUSTOMER' && (
-          <div className="text-center text-[10px] text-gray-400 bg-green-50 rounded-lg p-2">
-            Mock Customer OTP is <span className="font-bold">123456</span>
-          </div>
-        )}
       </div>
     </div>
   );

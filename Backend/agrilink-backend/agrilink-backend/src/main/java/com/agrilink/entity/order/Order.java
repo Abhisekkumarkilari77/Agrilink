@@ -45,6 +45,26 @@ public class Order {
     private String deliveryPartnerId;
     private String farmerId;
 
+    // Delivery & OTP flow enhancements
+    private String pickupStatus;
+    private String deliveryStatus;
+    private Instant pickupTime;
+    private Instant deliveryTime;
+    private String deliveryAssignmentStatus;
+    private Instant deliveryAcceptedAt;
+    private Instant deliveryCompletedAt;
+    private String paymentStatus;
+    private String transactionId;
+    private Instant paymentTime;
+    private Double amountPaid;
+    private Boolean paymentCollected;
+    private Boolean otpVerified;
+    private String otpGenerated;
+    private Instant otpGeneratedAt;
+    private Instant otpExpiry;
+    private Integer otpAttempts;
+    private Instant otpVerifiedAt;
+
     @CreatedDate
     private Instant createdAt;
 

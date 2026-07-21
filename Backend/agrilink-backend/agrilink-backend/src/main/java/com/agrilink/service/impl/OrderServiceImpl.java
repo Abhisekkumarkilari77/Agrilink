@@ -49,7 +49,7 @@ public class OrderServiceImpl implements OrderService {
                 .deliverySlot(request.getSlot())
                 .paymentMethod(request.getPaymentMethod())
                 .total(request.getTotal())
-                .status(OrderStatus.PENDING)
+                .status(OrderStatus.ORDER_PLACED)
                 .farmerId(farmerId)
                 .trackingSteps(trackingSteps)
                 .build();
@@ -117,7 +117,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public ApiResponse<List<OrderResponse>> getAvailableOrdersForDelivery() {
         // Fetch orders that are pending and have no delivery partner assigned
-        List<OrderResponse> orders = orderRepository.findByStatus(OrderStatus.PENDING).stream()
+        List<OrderResponse> orders = orderRepository.findByStatus(OrderStatus.FARMER_ACCEPTED).stream()
                 .filter(order -> order.getDeliveryPartnerId() == null)
                 .map(orderMapper::toResponse)
                 .collect(Collectors.toList());

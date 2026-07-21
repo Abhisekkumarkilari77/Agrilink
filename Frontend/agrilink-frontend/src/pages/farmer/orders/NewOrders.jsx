@@ -24,7 +24,7 @@ const NewOrders = () => {
 
   const handleAccept = async (id) => {
     try {
-      await farmerService.updateOrderStatus(id, 'ACCEPTED');
+      await farmerService.updateOrderStatus(id, 'FARMER_ACCEPTED');
       setMessage('Order accepted successfully.');
       fetchOrders();
     } catch (err) {
@@ -55,21 +55,6 @@ const NewOrders = () => {
     }
   };
 
-  const handleVerifyOtp = async (id) => {
-    const enteredOtp = otpInputs[id];
-    if (enteredOtp === '123456') { // Mock OTP Handshake
-      try {
-        await farmerService.updateOrderStatus(id, 'DELIVERED');
-        setMessage('OTP Verified! Package handed over successfully.');
-        fetchOrders();
-      } catch (err) {
-        alert('Failed to complete pickup.');
-      }
-    } else {
-      alert('Invalid OTP. Enter 123456 to verify.');
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex justify-center items-center py-24">
@@ -78,8 +63,8 @@ const NewOrders = () => {
     );
   }
 
-  const incoming = orders.filter(o => o.status === 'PENDING');
-  const active = orders.filter(o => o.status === 'ACCEPTED' || o.status === 'PACKED');
+  const incoming = orders.filter(o => o.status === 'PENDING' || o.status === 'ORDER_PLACED' || o.status === 'CONFIRMED');
+  const active = orders.filter(o => o.status === 'FARMER_ACCEPTED' || o.status === 'DELIVERY_ACCEPTED' || o.status === 'ACCEPTED' || o.status === 'PACKED' || o.status === 'PICKED_UP');
   const completed = orders.filter(o => o.status === 'DELIVERED' || o.status === 'CANCELLED');
 
   return (
@@ -131,27 +116,27 @@ const NewOrders = () => {
               <div key={o.id} className="p-5 border rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center bg-gray-50/20 text-xs gap-4">
                 <div className="space-y-2">
                   <p className="font-bold text-gray-800 text-sm">Order ID: {o.id}</p>
-                  <p className="text-gray-500">Current Status: <span className="font-bold text-primary">{o.status}</span></p>
+                  <p className="text-gray-500">Current Status: <span className="font-bold text-primary">
+                    {o.status === 'FARMER_ACCEPTED' ? 'Preparing Order' :
+                     o.status === 'DELIVERY_ACCEPTED' ? 'Delivery Partner Assigned' :
+                     o.status === 'PICKED_UP' ? 'Picked Up (In Transit)' : o.status}
+                  </span></p>
                 </div>
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                  {o.status === 'ACCEPTED' && (
-                    <button onClick={() => handlePack(o.id)} className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold transition">
-                      Mark Packed & Ready
-                    </button>
+                  {(o.status === 'FARMER_ACCEPTED' || o.status === 'CONFIRMED') && (
+                    <span className="text-xs font-bold text-amber-600 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200">
+                      Awaiting Delivery Driver Assignment
+                    </span>
                   )}
-                  {o.status === 'PACKED' && (
-                    <div className="flex items-center space-x-2 border rounded-xl overflow-hidden bg-white p-1">
-                      <input
-                        type="text"
-                        placeholder="Driver OTP"
-                        value={otpInputs[o.id] || ''}
-                        onChange={e => setOtpInputs({ ...otpInputs, [o.id]: e.target.value })}
-                        className="px-3 py-1 text-xs focus:outline-none w-24 font-bold"
-                      />
-                      <button onClick={() => handleVerifyOtp(o.id)} className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-xs font-bold rounded-lg transition">
-                        Verify
-                      </button>
-                    </div>
+                  {o.status === 'DELIVERY_ACCEPTED' && (
+                    <span className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200 animate-pulse">
+                      Driver en route to your farm
+                    </span>
+                  )}
+                  {o.status === 'PICKED_UP' && (
+                    <span className="text-xs font-bold text-green-600 bg-green-50 px-3 py-1.5 rounded-lg border border-green-200">
+                      Picked up by Driver
+                    </span>
                   )}
                 </div>
               </div>

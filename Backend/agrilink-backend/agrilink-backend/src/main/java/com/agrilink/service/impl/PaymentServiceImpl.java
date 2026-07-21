@@ -62,8 +62,26 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Payment not found"));
 
-        payment.setStatus(PaymentStatus.valueOf(status.toUpperCase()));
+        PaymentStatus paymentStatusEnum = PaymentStatus.valueOf(status.toUpperCase());
+        payment.setStatus(paymentStatusEnum);
         payment = paymentRepository.save(payment);
+
+        // Update corresponding Order details
+        Order order = orderRepository.findById(payment.getOrderId()).orElse(null);
+        if (order != null) {
+            order.setPaymentStatus(paymentStatusEnum.name());
+            order.setTransactionId(payment.getTransactionId());
+            order.setPaymentTime(java.time.Instant.now());
+            order.setAmountPaid(payment.getAmount());
+            if (paymentStatusEnum == PaymentStatus.SUCCESS) {
+                order.setStatus(com.agrilink.enums.OrderStatus.CONFIRMED);
+                order.getTrackingSteps().add("Order Confirmed (Payment Success)");
+            } else if (paymentStatusEnum == PaymentStatus.FAILED) {
+                order.setStatus(com.agrilink.enums.OrderStatus.CANCELLED);
+                order.getTrackingSteps().add("Order Cancelled (Payment Failed)");
+            }
+            orderRepository.save(order);
+        }
 
         return ApiResponse.success("Payment status updated", toResponse(payment));
     }

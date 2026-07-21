@@ -32,17 +32,69 @@ public class DeliveryController {
         return ResponseEntity.ok(deliveryService.acceptOrder(deliveryPartnerId, orderId));
     }
 
-    @PostMapping("/{orderId}/verify-pickup")
+    @GetMapping("/orders/{deliveryPartnerId}")
+    public ResponseEntity<ApiResponse<List<OrderResponse>>> getOrdersForDeliveryPartner(
+            @PathVariable String deliveryPartnerId) {
+        return ResponseEntity.ok(deliveryService.getOrdersForDeliveryPartner(deliveryPartnerId));
+    }
+
+    @PostMapping("/{orderId}/generate-pickup-otp")
+    public ResponseEntity<ApiResponse<OrderResponse>> generatePickupOtp(
+            @PathVariable String orderId) {
+        return ResponseEntity.ok(deliveryService.generatePickupOtp(orderId));
+    }
+
+    @PostMapping("/{orderId}/verify-pickup-otp")
     public ResponseEntity<ApiResponse<OrderResponse>> verifyPickupOtp(
             @PathVariable String orderId,
             @RequestParam String otp) {
         return ResponseEntity.ok(deliveryService.verifyPickupOtp(orderId, otp));
     }
 
-    @PostMapping("/{orderId}/verify-delivery")
+    @PostMapping("/{orderId}/confirm-payment")
+    public ResponseEntity<ApiResponse<OrderResponse>> confirmPayment(
+            @PathVariable String orderId,
+            @RequestParam String paymentMethod) {
+        return ResponseEntity.ok(deliveryService.confirmPaymentAndCompleteDelivery(orderId, paymentMethod));
+    }
+
+    @PostMapping("/{orderId}/verify-otp")
     public ResponseEntity<ApiResponse<OrderResponse>> verifyDeliveryOtp(
             @PathVariable String orderId,
             @RequestParam String otp) {
         return ResponseEntity.ok(deliveryService.verifyDeliveryOtp(orderId, otp));
+    }
+
+    // New Mapped APIs for Delivery Assignments Flow
+    @GetMapping("/orders/available")
+    public ResponseEntity<ApiResponse<List<OrderResponse>>> getAvailableOrdersList() {
+        return ResponseEntity.ok(orderService.getAvailableOrdersForDelivery());
+    }
+
+    @PostMapping("/orders/{orderId}/accept")
+    public ResponseEntity<ApiResponse<OrderResponse>> acceptOrderPost(@PathVariable String orderId) {
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        com.agrilink.security.CustomUserDetails userDetails = (com.agrilink.security.CustomUserDetails) auth.getPrincipal();
+        String deliveryPartnerId = userDetails.getId();
+        return ResponseEntity.ok(deliveryService.acceptOrder(deliveryPartnerId, orderId));
+    }
+
+    @PostMapping("/orders/{orderId}/pickup/generate")
+    public ResponseEntity<ApiResponse<OrderResponse>> generatePickupOtpPost(@PathVariable String orderId) {
+        return ResponseEntity.ok(deliveryService.generatePickupOtp(orderId));
+    }
+
+    @PostMapping("/orders/{orderId}/pickup")
+    public ResponseEntity<ApiResponse<OrderResponse>> verifyPickupOtpPost(
+            @PathVariable String orderId,
+            @RequestParam String otp) {
+        return ResponseEntity.ok(deliveryService.verifyPickupOtp(orderId, otp));
+    }
+
+    @PostMapping("/orders/{orderId}/complete")
+    public ResponseEntity<ApiResponse<OrderResponse>> completeDeliveryPost(
+            @PathVariable String orderId,
+            @RequestParam String paymentMethod) {
+        return ResponseEntity.ok(deliveryService.confirmPaymentAndCompleteDelivery(orderId, paymentMethod));
     }
 }

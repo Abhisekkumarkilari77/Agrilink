@@ -44,7 +44,7 @@ export const deliveryService = {
       const orders = getMockDeliveryOrders();
       return orders.filter(o => o.status !== 'DELIVERED' && o.status !== 'REJECTED');
     }
-    const response = await axiosInstance.get('/delivery/available-orders');
+    const response = await axiosInstance.get('/delivery/orders/available');
     return response.data.data || response.data;
   },
 
@@ -60,8 +60,7 @@ export const deliveryService = {
       }
       throw new Error('Order not found');
     }
-    const user = JSON.parse(localStorage.getItem('agrilink_user') || '{}');
-    const response = await axiosInstance.post(`/delivery/${user.id}/accept/${id}`);
+    const response = await axiosInstance.post(`/delivery/orders/${id}/accept`);
     return response.data.data || response.data;
   },
 
@@ -98,6 +97,26 @@ export const deliveryService = {
     return response.data.data || response.data;
   },
 
+  getMyDeliveries: async () => {
+    if (MOCK_MODE) {
+      await new Promise(resolve => setTimeout(resolve, 400));
+      const orders = getMockDeliveryOrders();
+      return orders.filter(o => o.status === 'ACCEPTED' || o.status === 'PICKED_UP');
+    }
+    const user = JSON.parse(localStorage.getItem('agrilink_user') || '{}');
+    const response = await axiosInstance.get(`/delivery/orders/${user.id}`);
+    return response.data.data || response.data;
+  },
+
+  generatePickupOtp: async (id) => {
+    if (MOCK_MODE) {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      return { message: 'Pickup OTP generated (Mock).' };
+    }
+    const response = await axiosInstance.post(`/delivery/orders/${id}/pickup/generate`);
+    return response.data.data || response.data;
+  },
+
   verifyPickupOtp: async (id, otp) => {
     if (MOCK_MODE) {
       await new Promise(resolve => setTimeout(resolve, 600));
@@ -106,23 +125,22 @@ export const deliveryService = {
       }
       throw new Error('Invalid Farmer OTP. Enter 1234 to verify.');
     }
-    const response = await axiosInstance.post(`/delivery/${id}/verify-pickup?otp=${otp}`);
+    const response = await axiosInstance.post(`/delivery/orders/${id}/pickup?otp=${otp}`);
+    return response.data.data || response.data;
+  },
+
+  confirmPayment: async (id, paymentMethod) => {
+    if (MOCK_MODE) {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      return deliveryService.updateDeliveryStatus(id, 'DELIVERED');
+    }
+    const response = await axiosInstance.post(`/delivery/orders/${id}/complete?paymentMethod=${paymentMethod}`);
     return response.data.data || response.data;
   },
 
   verifyDeliveryOtp: async (id, otp) => {
-    if (MOCK_MODE) {
-      await new Promise(resolve => setTimeout(resolve, 600));
-      if (otp === '123456' || otp === '5678') {
-        const order = await deliveryService.updateDeliveryStatus(id, 'DELIVERED');
-        let earnings = Number(localStorage.getItem('agrilink_delivery_lifetime_earnings') || '0');
-        localStorage.setItem('agrilink_delivery_lifetime_earnings', (earnings + (order.earnings || 100)).toString());
-        return order;
-      }
-      throw new Error('Invalid Customer OTP. Enter 5678 to verify.');
-    }
-    const response = await axiosInstance.post(`/delivery/${id}/verify-delivery?otp=${otp}`);
-    return response.data.data || response.data;
+    // Left for backward compatibility, routes to payment confirmation
+    return deliveryService.confirmPayment(id, 'COD');
   },
 
   getEarnings: async () => {

@@ -23,4 +23,25 @@ public class OrderResponse {
     private double total;
     private OrderStatus status;
     private List<String> trackingSteps;
+
+    // Enhanced details
+    private String customerName;
+    private String customerPhone;
+    private String customerEmail;
+    private String farmerId;
+    private String farmerName;
+    private String farmerPhone;
+    private String farmerAddress;
+    private String deliveryPartnerId;
+    private String pickupStatus;
+    private String deliveryStatus;
+    private String deliveryAssignmentStatus;
+    private java.time.Instant deliveryAcceptedAt;
+    private java.time.Instant deliveryCompletedAt;
+    private String paymentStatus;
+    private String transactionId;
+    private java.time.Instant paymentTime;
+    private Double amountPaid;
+    private Boolean paymentCollected;
+    private Boolean otpVerified;
 }

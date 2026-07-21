@@ -146,6 +146,10 @@ export const farmerService = {
       }
       throw new Error('Order not found');
     }
+    if (status === 'FARMER_ACCEPTED') {
+      const response = await axiosInstance.put(`/farmer/orders/${orderId}/accept`);
+      return response.data.data || response.data;
+    }
     const response = await axiosInstance.put(`/orders/${orderId}/status?status=${status}`);
     return response.data.data || response.data;
   },

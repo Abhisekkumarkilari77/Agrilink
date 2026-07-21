@@ -50,8 +50,11 @@ public class SecurityConfig {
                 .requestMatchers("/farmer/**").hasRole("FARMER")
                 // Delivery endpoints
                 .requestMatchers("/delivery/**").hasRole("DELIVERY")
-                // Customer endpoints
-                .requestMatchers("/customer/**").hasRole("CUSTOMER")
+                // Orders endpoints
+                .requestMatchers("/orders/customer/**").hasRole("CUSTOMER")
+                .requestMatchers("/orders/farmer/**").hasRole("FARMER")
+                .requestMatchers("/orders/delivery/**").hasRole("DELIVERY")
+                .requestMatchers("/orders/**").authenticated()
                 // Everything else needs auth
                 .anyRequest().authenticated()
             );
