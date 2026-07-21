@@ -1,0 +1,2 @@
+// storage
+export const storage = {};

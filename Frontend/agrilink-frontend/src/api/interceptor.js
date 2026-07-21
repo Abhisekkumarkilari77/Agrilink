@@ -1,0 +1,2 @@
+// interceptor
+export const interceptor = {};

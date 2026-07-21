@@ -1,0 +1,2 @@
+// calculatePrice
+export const calculatePrice = {};

@@ -1,0 +1,2 @@
+// formatDate
+export const formatDate = {};

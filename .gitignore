@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+target/
+*.jar
+*.war
+
+# Environment & IDE
+.env.local
+.vscode/
+.idea/
+*.iml
+*.log
+
+# OS artifacts
+.DS_Store
+Thumbs.db
