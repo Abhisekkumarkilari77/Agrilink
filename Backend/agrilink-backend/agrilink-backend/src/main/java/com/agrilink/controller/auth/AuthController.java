@@ -42,7 +42,7 @@ public class AuthController {
     }
 
     @PostMapping({"/otp/verify", "/verify-otp"})
-    public ResponseEntity<ApiResponse<String>> verifyOtp(@Valid @RequestBody OtpRequest request) {
+    public ResponseEntity<ApiResponse<?>> verifyOtp(@Valid @RequestBody OtpRequest request) {
         return ResponseEntity.ok(authService.verifyOtp(request));
     }
 

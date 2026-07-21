@@ -160,7 +160,8 @@ export const authService = {
       }
       throw { response: { data: { message: 'Invalid OTP. Enter 123456 to pass mock verification.' } } };
     }
-    const response = await axiosInstance.post(API_ENDPOINTS.VERIFY_OTP, { otp });
+    const target = sessionStorage.getItem('agrilink_otp_target');
+    const response = await axiosInstance.post(API_ENDPOINTS.VERIFY_OTP, { otp, target });
     return response.data.data || response.data;
   },
 

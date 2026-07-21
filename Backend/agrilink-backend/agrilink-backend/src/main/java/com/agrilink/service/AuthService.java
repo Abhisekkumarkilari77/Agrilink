@@ -12,7 +12,7 @@ public interface AuthService {
     ApiResponse<User> registerDelivery(DeliveryRegisterRequest request);
     
     ApiResponse<String> sendOtp(OtpRequest request);
-    ApiResponse<String> verifyOtp(OtpRequest request);
+    ApiResponse<?> verifyOtp(OtpRequest request);
     
     ApiResponse<String> forgotPassword(String email);
     ApiResponse<String> resetPassword(String otp, String newPassword);

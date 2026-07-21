@@ -72,10 +72,13 @@ public class AuthServiceImpl implements AuthService {
                 .mobile(request.getMobile())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(RoleType.CUSTOMER)
-                .status(AccountStatus.ACTIVE)
+                .status(AccountStatus.PENDING)
                 .build();
 
-        return ApiResponse.success("Customer registered successfully", userRepository.save(user));
+        user = userRepository.save(user);
+        sendOtp(OtpRequest.builder().target(user.getEmail()).build());
+
+        return ApiResponse.success("Customer registered successfully. OTP sent to email.", user);
     }
 
     @Override
@@ -88,12 +91,15 @@ public class AuthServiceImpl implements AuthService {
                 .mobile(request.getMobile())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(RoleType.FARMER)
-                .status(AccountStatus.PENDING) // Needs admin approval
+                .status(AccountStatus.PENDING)
                 .farmName(request.getFarmName())
                 .aadhaarNumber(request.getAadhaarNumber())
                 .build();
 
-        return ApiResponse.success("Farmer registered successfully. Pending admin approval.", userRepository.save(user));
+        user = userRepository.save(user);
+        sendOtp(OtpRequest.builder().target(user.getEmail()).build());
+
+        return ApiResponse.success("Farmer registered successfully. OTP sent to email.", user);
     }
 
     @Override
@@ -106,11 +112,14 @@ public class AuthServiceImpl implements AuthService {
                 .mobile(request.getMobile())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(RoleType.DELIVERY)
-                .status(AccountStatus.PENDING) // Needs admin approval
+                .status(AccountStatus.PENDING)
                 .vehicleNumber(request.getVehicleNumber())
                 .build();
 
-        return ApiResponse.success("Delivery partner registered successfully. Pending admin approval.", userRepository.save(user));
+        user = userRepository.save(user);
+        sendOtp(OtpRequest.builder().target(user.getEmail()).build());
+
+        return ApiResponse.success("Delivery partner registered successfully. OTP sent to email.", user);
     }
 
     private void validateNewUser(String email, String mobile) {
@@ -152,24 +161,48 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ApiResponse<String> verifyOtp(OtpRequest request) {
-        // Support 123456 as universal test OTP for development/testing
-        if ("123456".equals(request.getOtp())) {
-            return ApiResponse.success("OTP verified successfully", null);
-        }
+    public ApiResponse<?> verifyOtp(OtpRequest request) {
+        boolean isMockOtp = "123456".equals(request.getOtp());
+        boolean isVerified = false;
 
-        Optional<OTPVerification> otpOpt = Optional.empty();
-        if (request.getTarget() != null && !request.getTarget().isEmpty()) {
-            otpOpt = otpRepository.findTopByTargetOrderByCreatedAtDesc(request.getTarget());
-        }
-
-        if (otpOpt.isPresent() && otpOpt.get().getOtp().equals(request.getOtp())) {
-            if (otpOpt.get().getExpiresAt().isBefore(Instant.now())) {
-                throw new BadRequestException("OTP has expired");
+        if (isMockOtp) {
+            isVerified = true;
+        } else {
+            Optional<OTPVerification> otpOpt = Optional.empty();
+            if (request.getTarget() != null && !request.getTarget().isEmpty()) {
+                otpOpt = otpRepository.findTopByTargetOrderByCreatedAtDesc(request.getTarget());
             }
-            OTPVerification otp = otpOpt.get();
-            otp.setVerified(true);
-            otpRepository.save(otp);
+
+            if (otpOpt.isPresent() && otpOpt.get().getOtp().equals(request.getOtp())) {
+                if (otpOpt.get().getExpiresAt().isBefore(Instant.now())) {
+                    throw new BadRequestException("OTP has expired");
+                }
+                OTPVerification otpVal = otpOpt.get();
+                otpVal.setVerified(true);
+                otpRepository.save(otpVal);
+                isVerified = true;
+            }
+        }
+
+        if (isVerified) {
+            if (request.getTarget() != null && !request.getTarget().isEmpty()) {
+                Optional<User> userOpt = userRepository.findByEmail(request.getTarget());
+                if (!userOpt.isPresent()) {
+                    userOpt = userRepository.findByMobile(request.getTarget());
+                }
+
+                if (userOpt.isPresent()) {
+                    User user = userOpt.get();
+                    if (user.getRole() == RoleType.CUSTOMER) {
+                        user.setStatus(AccountStatus.ACTIVE);
+                    } else {
+                        // Farmers and Delivery partners need admin approval
+                        user.setStatus(AccountStatus.PENDING);
+                    }
+                    userRepository.save(user);
+                    return ApiResponse.success("OTP verified successfully", user);
+                }
+            }
             return ApiResponse.success("OTP verified successfully", null);
         }
 
