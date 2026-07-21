@@ -37,7 +37,7 @@ public class ProductServiceImpl implements ProductService {
                 .category(request.getCategory())
                 .price(request.getPrice())
                 .quantity(request.getQuantity())
-                .organic(request.isOrganic())
+                .organic(Boolean.TRUE.equals(request.getOrganic()))
                 .description(request.getDescription())
                 .image(request.getImage())
                 .build();
@@ -55,7 +55,7 @@ public class ProductServiceImpl implements ProductService {
         product.setCategory(request.getCategory());
         product.setPrice(request.getPrice());
         product.setQuantity(request.getQuantity());
-        product.setOrganic(request.isOrganic());
+        product.setOrganic(Boolean.TRUE.equals(request.getOrganic()));
         product.setDescription(request.getDescription());
         
         if (request.getImage() != null) {

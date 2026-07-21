@@ -24,7 +24,7 @@ public class ProductRequest {
     @NotNull(message = "Quantity is required")
     private Integer quantity;
 
-    private boolean organic;
+    private Boolean organic;
     private String description;
     private String image;
 }
