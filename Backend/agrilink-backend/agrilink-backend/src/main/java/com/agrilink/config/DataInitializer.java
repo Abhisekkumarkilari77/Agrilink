@@ -96,11 +96,9 @@ public class DataInitializer implements CommandLineRunner {
             }
         }
 
-        // 6. Seed 50 Default Products if MongoDB is empty
-        if (productRepository.count() < 50) {
-            productRepository.deleteAll();
-            seedDefaultProducts(Arrays.asList(farmer1, farmer2, farmer3, farmer4, farmer5));
-        }
+        // 6. Seed 50 Default Products (Always refresh/re-seed to guarantee correct image mappings and no stale products)
+        productRepository.deleteAll();
+        seedDefaultProducts(Arrays.asList(farmer1, farmer2, farmer3, farmer4, farmer5));
     }
 
     private void seedDefaultProducts(List<User> farmers) {
