@@ -223,6 +223,7 @@ public class DataInitializer implements CommandLineRunner {
                 .description("Freshly harvested " + name + " directly from " + farmer.getFarmName() + ". 100% farm-fresh, pesticide-tested, and chemical-free.")
                 .status("Available")
                 .ordersReceived(5 + idx * 3)
+                .isSeeded(true)
                 .build();
 
         product.setImageUrl(getProductImage(product.getName()));

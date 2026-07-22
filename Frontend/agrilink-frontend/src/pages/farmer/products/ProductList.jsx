@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ProductImage from '../../../components/common/ProductImage';
 import farmerService from '../../../services/farmerService';
 
 const ProductList = () => {
@@ -67,15 +68,17 @@ const ProductList = () => {
       </div>
 
       {products.length === 0 ? (
-        <div className="text-center py-12 text-gray-500 bg-white rounded-3xl border border-gray-150 p-6">
-          No listed products found. List your first crop to start selling!
+        <div className="text-center py-12 text-gray-500 bg-white rounded-3xl border border-gray-150 p-6 flex flex-col items-center justify-center space-y-2">
+          <p className="font-bold text-base text-gray-700">No Crop Listings Found</p>
+          <p className="text-xs text-gray-400">You haven't listed any crops yet.</p>
+          <p className="text-xs text-gray-400">Click "Add Product" to list your first crop.</p>
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
           {products.map((p) => (
             <div key={p.id} className="bg-white rounded-3xl overflow-hidden border border-gray-150 shadow-sm flex flex-col justify-between">
               <div className="h-40 bg-gray-100 relative">
-                <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                <ProductImage src={p.image} alt={p.name} className="w-full h-full object-cover" />
                 <span className="absolute top-3 left-3 bg-green-600 text-white text-[9px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full">
                   {p.category}
                 </span>

@@ -77,6 +77,9 @@ public class Product {
 
     @LastModifiedDate
     private Instant updatedAt;
+    @Builder.Default
+    private Boolean isSeeded = false;
+
     public void setImageUrl(String imageUrl) {
         this.image = imageUrl;
     }

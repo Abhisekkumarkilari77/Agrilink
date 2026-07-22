@@ -4,6 +4,8 @@ import { useWishlist } from '../../context/WishlistContext';
 import { useCart } from '../../context/CartContext';
 import { useToast } from '../../context/ToastContext';
 
+import ProductImage from '../common/ProductImage';
+
 const ProductCard = ({ product, animDelay = 0 }) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
@@ -47,7 +49,7 @@ const ProductCard = ({ product, animDelay = 0 }) => {
         className="relative cursor-pointer h-48 bg-stone-100 overflow-hidden"
         onClick={() => navigate(`/customer/products/${product.id}`)}
       >
-        <img
+        <ProductImage
           src={product.image}
           alt={product.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"

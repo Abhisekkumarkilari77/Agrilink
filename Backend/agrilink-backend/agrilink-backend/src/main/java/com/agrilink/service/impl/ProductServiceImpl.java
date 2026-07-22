@@ -92,7 +92,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ApiResponse<List<ProductResponse>> getProductsByFarmer(String farmerId) {
-        List<ProductResponse> products = productRepository.findByFarmerId(farmerId).stream()
+        List<ProductResponse> products = productRepository.findByFarmerIdAndNotSeeded(farmerId).stream()
                 .map(productMapper::toResponse)
                 .collect(Collectors.toList());
         return ApiResponse.success("Farmer products fetched successfully", products);
