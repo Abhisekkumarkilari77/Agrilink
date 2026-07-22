@@ -11,6 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.agrilink.security.CustomUserDetails;
+import org.springframework.security.core.Authentication;
 import java.util.List;
 
 @RestController
@@ -19,6 +22,14 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+
+    @PostMapping
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public ResponseEntity<ApiResponse<OrderResponse>> createOrderFromContext(@Valid @RequestBody OrderRequest request) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+        return ResponseEntity.ok(orderService.createOrder(userDetails.getId(), request));
+    }
 
     @PostMapping("/customer/{userId}")
     @PreAuthorize("hasRole('CUSTOMER')")
