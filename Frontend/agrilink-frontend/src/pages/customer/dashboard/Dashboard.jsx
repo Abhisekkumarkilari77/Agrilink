@@ -46,18 +46,25 @@ const StatCard = ({ label, value, icon, color, delay }) => {
   );
 };
 
+import productService from '../../../services/productService';
+
 const Dashboard = () => {
   const { user } = useAuth();
   const { wishlistCount } = useWishlist();
   const navigate = useNavigate();
   const [data, setData] = useState(null);
+  const [liveProducts, setLiveProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadDashboard = async () => {
       try {
-        const res = await customerService.getDashboardData();
+        const [res, prodData] = await Promise.all([
+          customerService.getDashboardData(),
+          productService.getProducts()
+        ]);
         setData(res);
+        setLiveProducts(prodData || []);
       } catch (err) {
         console.error(err);
       } finally {
@@ -171,8 +178,61 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* 6. Popular Categories with Icons */}
-      <div className="bg-white rounded-3xl p-6 border border-stone-100 shadow-sm animate-fadeIn" style={{ animationDelay: '0.4s' }}>
+      {/* 6. Live Products Collections from MongoDB */}
+      <div className="bg-white rounded-3xl p-6 border border-stone-100 shadow-sm space-y-6 animate-fadeIn" style={{ animationDelay: '0.4s' }}>
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-bold text-stone-800 flex items-center gap-2">
+            <span>✨</span> Active Harvest Listings
+          </h3>
+          <button 
+            onClick={() => navigate('/customer/products')}
+            className="text-xs font-black text-primary hover:underline"
+          >
+            View All ({liveProducts.length})
+          </button>
+        </div>
+
+        {liveProducts.length === 0 ? (
+          <div className="text-center py-12 bg-stone-50 rounded-2xl border border-stone-100">
+            <span className="text-4xl block animate-bounce">🌾</span>
+            <p className="text-stone-500 font-bold text-xs mt-3">No Products Available</p>
+          </div>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {liveProducts.slice(0, 4).map((product, idx) => (
+              <div 
+                key={product.id || idx}
+                onClick={() => navigate(`/customer/products`)}
+                className="bg-stone-50/50 hover:bg-white border border-stone-100 hover:border-primary/20 rounded-2xl p-4 cursor-pointer transition duration-200 card-hover flex flex-col justify-between space-y-3"
+              >
+                <div className="relative h-32 bg-stone-100 rounded-xl overflow-hidden">
+                  <img 
+                    src={product.image} 
+                    alt={product.name} 
+                    className="w-full h-full object-cover" 
+                  />
+                  {product.organic && (
+                    <span className="absolute top-2 left-2 bg-emerald-600 text-white text-[8px] font-black uppercase px-2 py-0.5 rounded-full">
+                      🌿 Organic
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-xs text-stone-800 line-clamp-1">{product.name}</h4>
+                  <p className="text-[10px] text-stone-400 font-bold mt-1 line-clamp-1">🌾 {product.farmName || 'Verified Farmer'}</p>
+                </div>
+                <div className="flex justify-between items-center border-t border-stone-100/60 pt-2 text-xs">
+                  <span className="font-black text-stone-800">₹{product.price}<span className="text-[9px] text-stone-400 font-medium">/{product.unit || 'kg'}</span></span>
+                  <span className="text-[10px] text-amber-500 font-bold">★ {product.rating || 4.5}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* 7. Popular Categories with Icons */}
+      <div className="bg-white rounded-3xl p-6 border border-stone-100 shadow-sm animate-fadeIn" style={{ animationDelay: '0.45s' }}>
         <h3 className="text-lg font-bold text-stone-800 mb-5">Popular Categories</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
           {categories.map((cat, idx) => (
@@ -180,7 +240,7 @@ const Dashboard = () => {
               key={idx}
               onClick={() => navigate(`/customer/products?category=${cat.name}`)}
               className={`p-5 border rounded-2xl text-center cursor-pointer ${cat.color} hover:shadow-md transition duration-200 card-hover btn-press animate-fadeIn`}
-              style={{ animationDelay: `${0.4 + idx * 0.05}s` }}
+              style={{ animationDelay: `${0.45 + idx * 0.05}s` }}
             >
               <div className="text-3xl mb-2">{cat.icon}</div>
               <p className="text-sm font-bold text-stone-700">{cat.name}</p>

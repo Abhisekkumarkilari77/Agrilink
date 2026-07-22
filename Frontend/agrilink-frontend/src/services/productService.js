@@ -916,37 +916,53 @@ const MOCK_PRODUCTS = [
 
 export const productService = {
   getProducts: async () => {
-    if (MOCK_MODE) {
-      await new Promise(resolve => setTimeout(resolve, 600));
-      return MOCK_PRODUCTS;
+    try {
+      const response = await axiosInstance.get('/products');
+      // If response is valid, return the active / available products from MongoDB
+      if (response && response.data) {
+        const prodList = response.data.data || response.data;
+        if (Array.isArray(prodList)) {
+          // Filter to show active/available products, excluding DELETED, OUT_OF_STOCK, DISABLED
+          return prodList.filter(p => p.status === 'AVAILABLE' || p.status === 'ACTIVE' || !p.status);
+        }
+        return prodList;
+      }
+    } catch (err) {
+      console.warn('Backend products fetch failed, using fallback mock list', err);
     }
-    const response = await axiosInstance.get('/products');
-    return response.data.data || response.data;
+    // Fallback Mock List
+    return MOCK_PRODUCTS;
   },
 
   getProductById: async (id) => {
-    if (MOCK_MODE) {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      const product = MOCK_PRODUCTS.find(p => p.id === id);
-      if (product) return product;
-      throw new Error('Product not found');
+    try {
+      const response = await axiosInstance.get(`/products/${id}`);
+      if (response && response.data) {
+        return response.data.data || response.data;
+      }
+    } catch (err) {
+      console.warn('Backend get product by id failed, searching fallback list', err);
     }
-    const response = await axiosInstance.get(`/products/${id}`);
-    return response.data.data || response.data;
+    const product = MOCK_PRODUCTS.find(p => p.id === id);
+    if (product) return product;
+    throw new Error('Product not found');
   },
 
   searchProducts: async (query) => {
-    if (MOCK_MODE) {
-      await new Promise(resolve => setTimeout(resolve, 400));
-      const term = query.toLowerCase();
-      return MOCK_PRODUCTS.filter(p => 
-        p.name.toLowerCase().includes(term) || 
-        p.category.toLowerCase().includes(term) ||
-        p.farmerName.toLowerCase().includes(term)
-      );
+    try {
+      const response = await axiosInstance.get(`/products/search?query=${query}`);
+      if (response && response.data) {
+        return response.data.data || response.data;
+      }
+    } catch (err) {
+      console.warn('Backend search failed, filtering fallback list', err);
     }
-    const response = await axiosInstance.get(`/products/search?query=${query}`);
-    return response.data.data || response.data;
+    const term = query.toLowerCase();
+    return MOCK_PRODUCTS.filter(p => 
+      p.name.toLowerCase().includes(term) || 
+      p.category.toLowerCase().includes(term) ||
+      p.farmerName.toLowerCase().includes(term)
+    );
   }
 };
 

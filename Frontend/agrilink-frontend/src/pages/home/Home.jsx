@@ -708,7 +708,7 @@ const Home = () => {
         ) : filteredProducts.length === 0 ? (
           <div className="text-center py-20 bg-white/60 rounded-[32px] border border-white/40">
             <span className="text-5xl block animate-bounce">🥬</span>
-            <p className="text-slate-500 font-extrabold text-base mt-4">No matching products found</p>
+            <p className="text-slate-500 font-extrabold text-base mt-4">No Products Available</p>
             <p className="text-slate-400 text-xs mt-1">Try relaxing filters or search term parameters.</p>
           </div>
         ) : (
