@@ -3,7 +3,7 @@ import { BrowserRouter } from 'react-router-dom';
 import AppRoutes from './routes/AppRoutes';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
-import { ToastProvider } from './context/ToastContext';
+import { WishlistProvider } from './context/WishlistContext';
 
 const App = () => {
   return (
@@ -11,7 +11,9 @@ const App = () => {
       <ToastProvider>
         <AuthProvider>
           <CartProvider>
-            <AppRoutes />
+            <WishlistProvider>
+              <AppRoutes />
+            </WishlistProvider>
           </CartProvider>
         </AuthProvider>
       </ToastProvider>

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import useAuth from '../../../hooks/useAuth';
 import customerService from '../../../services/customerService';
 import { SkeletonDashboard } from '../../../components/common/SkeletonCard';
+import { useWishlist } from '../../../context/WishlistContext';
 
 /* ─── Animated Counter Hook ─── */
 const useAnimatedCounter = (targetValue, duration = 1200) => {
@@ -47,6 +48,7 @@ const StatCard = ({ label, value, icon, color, delay }) => {
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { wishlistCount } = useWishlist();
   const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -97,7 +99,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard label="Orders" value={data?.stats?.totalOrders} icon="📦" color="bg-blue-50" delay={0.05} />
         <StatCard label="Active Orders" value={data?.stats?.activeOrders} icon="🚚" color="bg-emerald-50" delay={0.1} />
-        <StatCard label="Wishlist" value={data?.stats?.wishlistItems} icon="❤️" color="bg-red-50" delay={0.15} />
+        <StatCard label="Wishlist" value={wishlistCount} icon="❤️" color="bg-red-50" delay={0.15} />
         <StatCard label="Addresses" value={data?.stats?.savedAddresses} icon="📍" color="bg-amber-50" delay={0.2} />
       </div>
 

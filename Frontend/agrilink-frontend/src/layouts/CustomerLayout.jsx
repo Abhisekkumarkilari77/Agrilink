@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
-import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 
 const CustomerLayout = () => {
   const { user, logout } = useAuth();
   const { getCartCount } = useCart();
+  const { wishlistCount } = useWishlist();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -13,8 +14,10 @@ const CustomerLayout = () => {
   const navLinks = [
     { label: 'Dashboard', path: '/customer/dashboard' },
     { label: 'Browse Products', path: '/customer/products' },
+    { label: 'Nearby Farmers', path: '/customer/products?nearby=true' },
     { label: 'My Orders', path: '/customer/orders' },
     { label: 'Wishlist', path: '/customer/wishlist' },
+    { label: 'Profile', path: '/customer/profile' },
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -46,14 +49,24 @@ const CustomerLayout = () => {
           ))}
         </nav>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3">
+          {/* Wishlist Icon */}
+          <Link to="/customer/wishlist" className="relative p-2 text-stone-500 hover:text-primary transition" title="View Wishlist">
+            <span className="text-xl">❤️</span>
+            {wishlistCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white rounded-full text-[10px] w-5 h-5 flex items-center justify-center font-bold animate-scaleIn">
+                {wishlistCount}
+              </span>
+            )}
+          </Link>
+
           {/* Cart Icon */}
-          <Link to="/customer/cart" className="relative p-2 text-stone-500 hover:text-primary transition">
+          <Link to="/customer/cart" className="relative p-2 text-stone-500 hover:text-primary transition" title="View Cart">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
             </svg>
             {getCartCount() > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white rounded-full text-[10px] w-5 h-5 flex items-center justify-center font-bold animate-scaleIn">
+              <span className="absolute -top-0.5 -right-0.5 bg-primary text-white rounded-full text-[10px] w-5 h-5 flex items-center justify-center font-bold animate-scaleIn">
                 {getCartCount()}
               </span>
             )}

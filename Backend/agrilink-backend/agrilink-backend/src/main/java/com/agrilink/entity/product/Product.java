@@ -58,6 +58,20 @@ public class Product {
     @Builder.Default
     private int ordersReceived = 0;
 
+    @Builder.Default
+    private String unit = "kg";
+
+    @Builder.Default
+    private double discount = 0.0;
+
+    @Builder.Default
+    private int reviewCount = 12;
+
+    @Builder.Default
+    private String deliveryTime = "2-4 hrs";
+
+    private java.util.List<String> images;
+
     @CreatedDate
     private Instant createdAt;
 

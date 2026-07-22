@@ -39,6 +39,7 @@ public class SecurityConfig {
                 .requestMatchers("/email/**").permitAll()
                 .requestMatchers("/products/**").permitAll()
                 .requestMatchers("/products/search/**").permitAll()
+                .requestMatchers("/customer/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
                 // Swagger
                 .requestMatchers("/swagger-ui/**", "/api-docs/**", "/swagger-ui.html").permitAll()
