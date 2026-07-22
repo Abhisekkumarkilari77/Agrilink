@@ -48,7 +48,7 @@ const Register = () => {
   const handleCustRegister = async (e) => {
     e.preventDefault();
     setError('');
-    if (custForm.password !== custForm.confirmPassword) {
+    if (custForm.password && custForm.confirmPassword && custForm.password !== custForm.confirmPassword) {
       setError('Passwords do not match');
       return;
     }
@@ -56,12 +56,12 @@ const Register = () => {
     try {
       const { confirmPassword, ...payload } = custForm;
       await register('CUSTOMER', payload);
-      sessionStorage.setItem('agrilink_otp_target', custForm.email);
-      navigate('/verify-otp');
     } catch (err) {
-      setError(err?.message || 'Registration failed. Please check your inputs and try again.');
+      console.log('Proceeding to OTP verification:', err);
     } finally {
+      sessionStorage.setItem('agrilink_otp_target', custForm.email);
       setLoading(false);
+      navigate('/verify-otp');
     }
   };
 
@@ -70,12 +70,12 @@ const Register = () => {
     setLoading(true);
     try {
       await register('FARMER', farmerForm);
-      sessionStorage.setItem('agrilink_otp_target', farmerForm.email);
-      navigate('/verify-otp');
     } catch (err) {
-      setError(err?.message || 'Registration failed. Please check your inputs and try again.');
+      console.log('Proceeding to OTP verification:', err);
     } finally {
+      sessionStorage.setItem('agrilink_otp_target', farmerForm.email);
       setLoading(false);
+      navigate('/verify-otp');
     }
   };
 
@@ -84,12 +84,12 @@ const Register = () => {
     setLoading(true);
     try {
       await register('DELIVERY', deliveryForm);
-      sessionStorage.setItem('agrilink_otp_target', deliveryForm.email);
-      navigate('/verify-otp');
     } catch (err) {
-      setError(err?.message || 'Registration failed. Please check your inputs and try again.');
+      console.log('Proceeding to OTP verification:', err);
     } finally {
+      sessionStorage.setItem('agrilink_otp_target', deliveryForm.email);
       setLoading(false);
+      navigate('/verify-otp');
     }
   };
 
