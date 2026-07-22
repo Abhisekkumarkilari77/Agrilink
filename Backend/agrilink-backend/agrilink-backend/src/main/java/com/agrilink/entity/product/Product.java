@@ -77,4 +77,11 @@ public class Product {
 
     @LastModifiedDate
     private Instant updatedAt;
+    public void setImageUrl(String imageUrl) {
+        this.image = imageUrl;
+    }
+
+    public String getImageUrl() {
+        return this.image;
+    }
 }
