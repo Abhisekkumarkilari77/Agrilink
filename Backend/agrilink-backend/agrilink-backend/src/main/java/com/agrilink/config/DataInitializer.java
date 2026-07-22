@@ -232,32 +232,127 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private String getProductImage(String cat, int idx) {
-        String[] vegImgs = {
+        return switch (cat) {
+            case "Vegetables" -> new String[]{
+                "https://images.unsplash.com/photo-1595855759920-86582396756a?w=500&q=80", // Tomatoes
+                "https://images.unsplash.com/photo-1566842600175-e76042b39418?w=500&q=80", // Capsicum
+                "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cf?w=500&q=80", // Onions
+                "https://images.unsplash.com/photo-1598170845058-12ef4a457c3b?w=500&q=80", // Carrots
+                "https://images.unsplash.com/photo-1604977042946-1eecc30f269e?w=500&q=80", // Cucumbers
+                "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=500&q=80", // Potatoes
+                "https://images.unsplash.com/photo-1568584711271-e0037e23112b?w=500&q=80", // Cauliflower
+                "https://images.unsplash.com/photo-1587570220677-668607a64a38?w=500&q=80", // Green Peas
+                "https://images.unsplash.com/photo-1587334206574-351ecdb77485?w=500&q=80", // Beetroots
+                "https://images.unsplash.com/photo-1592417817098-8f3d6eb19675?w=500&q=80"  // Bottle Gourd
+            }[idx - 1];
+            case "Fruits" -> new String[]{
+                "https://images.unsplash.com/photo-1553279768-865429fa0078?w=500&q=80", // Mangoes
+                "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=500&q=80", // Bananas
+                "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=500&q=80", // Apples
+                "https://images.unsplash.com/photo-1537640538966-79f369143f8f?w=500&q=80", // Grapes
+                "https://images.unsplash.com/photo-1526318896980-cf78c088247c?w=500&q=80", // Papaya
+                "https://images.unsplash.com/photo-1541348263662-e0c8643c21ec?w=500&q=80", // Pomegranate
+                "https://images.unsplash.com/photo-1534482421-64566f976cfa?w=500&q=80", // Guava
+                "https://images.unsplash.com/photo-1547514701-42782101795e?w=500&q=80", // Oranges
+                "https://images.unsplash.com/photo-1527325678964-54921661f888?w=500&q=80", // Dragon Fruit
+                "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=500&q=80"  // Watermelon
+            }[idx - 1];
+            case "Leafy Vegetables" -> new String[]{
+                "https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=500&q=80", // Spinach
+                "https://images.unsplash.com/photo-1588879460618-9249e7d947d1?w=500&q=80", // Coriander
+                "https://images.unsplash.com/photo-1608686207856-001b95cf60ca?w=500&q=80", // Mint
+                "https://images.unsplash.com/photo-1584556812952-905ffd0c611a?w=500&q=80", // Fenugreek
+                "https://images.unsplash.com/photo-1628134714488-66270725a371?w=500&q=80", // Amaranthus
+                "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=500&q=80", // Curry Leaves
+                "https://images.unsplash.com/photo-1580191947416-62d35a55e71d?w=500&q=80", // Spring Onion
+                "https://images.unsplash.com/photo-1622206194165-246f48597a18?w=500&q=80", // Lettuce
+                "https://images.unsplash.com/photo-1582515073490-39981397c445?w=500&q=80", // Mustard Greens
+                "https://images.unsplash.com/photo-1596701062351-852b727be45b?w=500&q=80"  // Dill Leaves
+            }[idx - 1];
+            case "Cereals", "Rice", "Wheat", "Millets", "Pulses" -> new String[]{
+                "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500&q=80", // Corn/Basmati
+                "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=500&q=80", // Barley/Raw Rice
+                "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500&q=80", // Sorghum/Brown Rice
+                "https://images.unsplash.com/photo-1508061253366-f7da158b6d4f?w=500&q=80", // Oats
+                "https://images.unsplash.com/photo-1600611422773-cbcfdfb7310d?w=500&q=80", // Rye
+                "https://images.unsplash.com/photo-1599940824399-b87987ceb72a?w=500&q=80", // Ragi
+                "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=500&q=80", // Proso
+                "https://images.unsplash.com/photo-1536620711904-8976b92a2a0b?w=500&q=80", // Barnyard
+                "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500&q=80", // Kodo
+                "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=500&q=80"  // Foxtail
+            }[idx - 1];
+            case "Spices" -> new String[]{
+                "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=500&q=80", // Turmeric
+                "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=500&q=80", // Chilli
+                "https://images.unsplash.com/photo-1508737027454-e6454ef45afd?w=500&q=80", // Pepper
+                "https://images.unsplash.com/photo-1532132644265-5152865c6978?w=500&q=80", // Cardamom
+                "https://images.unsplash.com/photo-1509358271058-acd22cc93898?w=500&q=80", // Cinnamon
+                "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=500&q=80", // Cumin
+                "https://images.unsplash.com/photo-1508737027454-e6454ef45afd?w=500&q=80", // Mustard
+                "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=500&q=80", // Coriander
+                "https://images.unsplash.com/photo-1509358271058-acd22cc93898?w=500&q=80", // Cloves
+                "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=500&q=80"  // Ginger
+            }[idx - 1];
+            case "Dairy" -> new String[]{
+                "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=500&q=80", // Cow Milk
+                "https://images.unsplash.com/photo-1563636619-e9143da7973b?w=500&q=80", // Buffalo Milk
+                "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=500&q=80", // Curd
+                "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=500&q=80", // Ghee
+                "https://images.unsplash.com/photo-1528750997573-59b89d66f4f7?w=500&q=80", // Paneer
+                "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=500&q=80", // Butter
+                "https://images.unsplash.com/photo-1563636619-e9143da7973b?w=500&q=80", // Buttermilk
+                "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=500&q=80", // Cream
+                "https://images.unsplash.com/photo-1528750997573-59b89d66f4f7?w=500&q=80", // Khoya
+                "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=500&q=80"  // Badam Milk
+            }[idx - 1];
+            case "Eggs" -> new String[]{
+                "https://images.unsplash.com/photo-1516448424440-9dbca97779c1?w=500&q=80", // Country Eggs
+                "https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=500&q=80", // Brown Eggs
+                "https://images.unsplash.com/photo-1516448424440-9dbca97779c1?w=500&q=80", // Quail Eggs
+                "https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=500&q=80", // Duck Eggs
+                "https://images.unsplash.com/photo-1516448424440-9dbca97779c1?w=500&q=80", // Omega Eggs
+                "https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=500&q=80", // White Eggs
+                "https://images.unsplash.com/photo-1516448424440-9dbca97779c1?w=500&q=80", // Double Yolk
+                "https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=500&q=80", // Herbal Eggs
+                "https://images.unsplash.com/photo-1516448424440-9dbca97779c1?w=500&q=80", // Village Eggs
+                "https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=500&q=80"  // Egg White Pack
+            }[idx - 1];
+            case "Honey" -> new String[]{
+                "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=500&q=80",
+                "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=500&q=80",
+                "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=500&q=80",
+                "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=500&q=80",
+                "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=500&q=80",
+                "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=500&q=80",
+                "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=500&q=80",
+                "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=500&q=80",
+                "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=500&q=80",
+                "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=500&q=80"
+            }[idx - 1];
+            case "Flowers" -> new String[]{
+                "https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=500&q=80", // Roses
+                "https://images.unsplash.com/photo-1508784932257-4b55ac6e5e8e?w=500&q=80", // Marigold
+                "https://images.unsplash.com/photo-1507290439931-a8e023f0a850?w=500&q=80", // Jasmine
+                "https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=500&q=80", // Carnations
+                "https://images.unsplash.com/photo-1508784932257-4b55ac6e5e8e?w=500&q=80", // Tuberose
+                "https://images.unsplash.com/photo-1507290439931-a8e023f0a850?w=500&q=80", // Orchid
+                "https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=500&q=80", // Gerbera
+                "https://images.unsplash.com/photo-1508784932257-4b55ac6e5e8e?w=500&q=80", // Chrysanthemum
+                "https://images.unsplash.com/photo-1507290439931-a8e023f0a850?w=500&q=80", // Lotus
+                "https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=500&q=80"  // Bouquet
+            }[idx - 1];
+            default -> new String[]{
                 "https://images.unsplash.com/photo-1595855759920-86582396756a?w=500&q=80",
                 "https://images.unsplash.com/photo-1566842600175-e76042b39418?w=500&q=80",
                 "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cf?w=500&q=80",
                 "https://images.unsplash.com/photo-1598170845058-12ef4a457c3b?w=500&q=80",
-                "https://images.unsplash.com/photo-1604977042946-1eecc30f269e?w=500&q=80"
+                "https://images.unsplash.com/photo-1604977042946-1eecc30f269e?w=500&q=80",
+                "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=500&q=80",
+                "https://images.unsplash.com/photo-1568584711271-e0037e23112b?w=500&q=80",
+                "https://images.unsplash.com/photo-1587570220677-668607a64a38?w=500&q=80",
+                "https://images.unsplash.com/photo-1587334206574-351ecdb77485?w=500&q=80",
+                "https://images.unsplash.com/photo-1592417817098-8f3d6eb19675?w=500&q=80"
+            }[(idx - 1) % 10];
         };
-        String[] fruitImgs = {
-                "https://images.unsplash.com/photo-1553279768-865429fa0078?w=500&q=80",
-                "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=500&q=80",
-                "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=500&q=80",
-                "https://images.unsplash.com/photo-1537640538966-79f369143f8f?w=500&q=80"
-        };
-        String[] grainImgs = {
-                "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500&q=80",
-                "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=500&q=80",
-                "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500&q=80"
-        };
-        String[] dairyImgs = {
-                "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=500&q=80",
-                "https://images.unsplash.com/photo-1528750997573-59b89d66f4f7?w=500&q=80"
-        };
-
-        if (cat.contains("Fruit")) return fruitImgs[idx % fruitImgs.length];
-        if (cat.contains("Dairy")) return dairyImgs[idx % dairyImgs.length];
-        if (cat.contains("Rice") || cat.contains("Wheat") || cat.contains("Grain") || cat.contains("Pulses")) return grainImgs[idx % grainImgs.length];
-        return vegImgs[idx % vegImgs.length];
     }
 }
