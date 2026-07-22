@@ -67,10 +67,9 @@ export const authService = {
   registerCustomer: async (data) => {
     if (MOCK_MODE) {
       await new Promise(resolve => setTimeout(resolve, 800));
-      const users = getMockUsers();
-      if (users.some(u => u.email === data.email || u.mobile === data.mobile)) {
-        throw { response: { data: { message: 'Email or Mobile already registered' } } };
-      }
+      let users = getMockUsers();
+      // Remove any previous unverified/pending account with same email/mobile
+      users = users.filter(u => u.email !== data.email && u.mobile !== data.mobile);
       const newUser = {
         id: `cust-${Date.now()}`,
         email: data.email,
@@ -81,6 +80,7 @@ export const authService = {
         status: 'ACTIVE'
       };
       sessionStorage.setItem('agrilink_pending_reg', JSON.stringify(newUser));
+      localStorage.setItem('agrilink_mock_users', JSON.stringify([...users, newUser]));
       return { message: 'OTP Sent successfully' };
     }
     const response = await axiosInstance.post(API_ENDPOINTS.REGISTER_CUSTOMER, data);
@@ -90,10 +90,8 @@ export const authService = {
   registerFarmer: async (data) => {
     if (MOCK_MODE) {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      const users = getMockUsers();
-      if (users.some(u => u.email === data.email || u.mobile === data.mobile || u.aadhaar === data.aadhaarNumber)) {
-        throw { response: { data: { message: 'Email, Mobile or Aadhaar already registered' } } };
-      }
+      let users = getMockUsers();
+      users = users.filter(u => u.email !== data.email && u.mobile !== data.mobile);
       const newUser = {
         id: `farmer-${Date.now()}`,
         email: data.email,
@@ -106,6 +104,7 @@ export const authService = {
         aadhaar: data.aadhaarNumber
       };
       sessionStorage.setItem('agrilink_pending_reg', JSON.stringify(newUser));
+      localStorage.setItem('agrilink_mock_users', JSON.stringify([...users, newUser]));
       return { message: 'OTP Sent successfully' };
     }
     const response = await axiosInstance.post(API_ENDPOINTS.REGISTER_FARMER, data);
@@ -115,10 +114,8 @@ export const authService = {
   registerDelivery: async (data) => {
     if (MOCK_MODE) {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      const users = getMockUsers();
-      if (users.some(u => u.email === data.email || u.mobile === data.mobile)) {
-        throw { response: { data: { message: 'Email or Mobile already registered' } } };
-      }
+      let users = getMockUsers();
+      users = users.filter(u => u.email !== data.email && u.mobile !== data.mobile);
       const newUser = {
         id: `delivery-${Date.now()}`,
         email: data.email,
@@ -130,6 +127,7 @@ export const authService = {
         vehicleNumber: data.vehicleNumber
       };
       sessionStorage.setItem('agrilink_pending_reg', JSON.stringify(newUser));
+      localStorage.setItem('agrilink_mock_users', JSON.stringify([...users, newUser]));
       return { message: 'OTP Sent successfully' };
     }
     const response = await axiosInstance.post(API_ENDPOINTS.REGISTER_DELIVERY, data);

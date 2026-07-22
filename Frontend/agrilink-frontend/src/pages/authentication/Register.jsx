@@ -54,7 +54,8 @@ const Register = () => {
     }
     setLoading(true);
     try {
-      await register('CUSTOMER', custForm);
+      const { confirmPassword, ...payload } = custForm;
+      await register('CUSTOMER', payload);
       sessionStorage.setItem('agrilink_otp_target', custForm.email);
       navigate('/verify-otp');
     } catch (err) {
