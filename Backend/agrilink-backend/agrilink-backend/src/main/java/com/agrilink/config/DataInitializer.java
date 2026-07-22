@@ -96,24 +96,156 @@ public class DataInitializer implements CommandLineRunner {
             }
         }
 
-        // 6. Seed 200+ Products if total count < 100
-        if (productRepository.count() < 100) {
-            productRepository.deleteAll(); // re-seed cleanly for 200+ products
-            List<Product> products = new ArrayList<>();
-            List<User> farmers = Arrays.asList(farmer1, farmer2, farmer3, farmer4, farmer5);
-
-            for (int catIdx = 0; catIdx < categoryNames.size(); catIdx++) {
-                String cat = categoryNames.get(catIdx);
-                for (int itemIdx = 1; itemIdx <= 10; itemIdx++) {
-                    User farmUser = farmers.get((catIdx + itemIdx) % farmers.size());
-                    Product p = createSeededProduct(cat, itemIdx, farmUser);
-                    products.add(p);
-                }
-            }
-
-            productRepository.saveAll(products);
-            System.out.println("✅ Successfully seeded 200 Products across 20 Categories into MongoDB!");
+        // 6. Seed 50 Default Products if MongoDB is empty
+        if (productRepository.count() < 50) {
+            productRepository.deleteAll();
+            seedDefaultProducts(Arrays.asList(farmer1, farmer2, farmer3, farmer4, farmer5));
         }
+    }
+
+    private void seedDefaultProducts(List<User> farmers) {
+        List<Product> products = new ArrayList<>();
+        
+        // Define Categories and Item Arrays
+        String[][] categoriesAndItems = {
+            {
+                "Vegetables",
+                "Tomato", "Potato", "Onion", "Brinjal", "Bottle Gourd",
+                "Bitter Gourd", "Cauliflower", "Cabbage", "Capsicum", "Carrot",
+                "Beans", "Beetroot", "Radish", "Spinach", "Mint",
+                "Coriander", "Drumstick", "Lady Finger", "Green Chilli"
+            },
+            {
+                "Fruits",
+                "Mango", "Banana", "Apple", "Orange", "Papaya",
+                "Watermelon", "Guava", "Pomegranate", "Dragon Fruit", "Pineapple"
+            },
+            {
+                "Grains",
+                "Rice", "Wheat", "Foxtail Millet", "Pearl Millet", "Ragi"
+            },
+            {
+                "Pulses",
+                "Rajma", "Green Gram", "Black Gram", "Toor Dal", "Bengal Gram"
+            },
+            {
+                "Spices",
+                "Turmeric", "Black Pepper", "Cardamom", "Coriander Seeds", "Cumin"
+            },
+            {
+                "Dairy",
+                "Milk", "Paneer", "Butter", "Cheese", "Honey", "Ghee"
+            }
+        };
+
+        // Static Pexels/Pixabay Image Mapping
+        Map<String, String> nonUnsplashImages = new HashMap<>();
+        nonUnsplashImages.put("Tomato", "https://images.pexels.com/photos/533280/pexels-photo-533280.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Potato", "https://images.pexels.com/photos/2286777/pexels-photo-2286777.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Onion", "https://images.pexels.com/photos/1443867/pexels-photo-1443867.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Brinjal", "https://images.pexels.com/photos/321552/pexels-photo-321552.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Bottle Gourd", "https://images.pexels.com/photos/5945903/pexels-photo-5945903.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Bitter Gourd", "https://images.pexels.com/photos/5945903/pexels-photo-5945903.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Cauliflower", "https://images.pexels.com/photos/461271/pexels-photo-461271.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Cabbage", "https://images.pexels.com/photos/2518874/pexels-photo-2518874.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Capsicum", "https://images.pexels.com/photos/2893635/pexels-photo-2893635.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Carrot", "https://images.pexels.com/photos/143133/pexels-photo-143133.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Beans", "https://images.pexels.com/photos/842571/pexels-photo-842571.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Beetroot", "https://images.pexels.com/photos/2325843/pexels-photo-2325843.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Radish", "https://images.pexels.com/photos/2325843/pexels-photo-2325843.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Spinach", "https://images.pexels.com/photos/2325843/pexels-photo-2325843.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Mint", "https://images.pexels.com/photos/6086862/pexels-photo-6086862.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Coriander", "https://images.pexels.com/photos/1081015/pexels-photo-1081015.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Drumstick", "https://images.pexels.com/photos/5945903/pexels-photo-5945903.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Lady Finger", "https://images.pexels.com/photos/2583187/pexels-photo-2583187.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Green Chilli", "https://images.pexels.com/photos/1435904/pexels-photo-1435904.jpeg?auto=compress&cs=tinysrgb&w=400");
+
+        nonUnsplashImages.put("Mango", "https://images.pexels.com/photos/2290293/pexels-photo-2290293.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Banana", "https://images.pexels.com/photos/2872755/pexels-photo-2872755.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Apple", "https://images.pexels.com/photos/206959/pexels-photo-206959.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Orange", "https://images.pexels.com/photos/2090901/pexels-photo-2090901.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Papaya", "https://images.pexels.com/photos/3658434/pexels-photo-3658434.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Watermelon", "https://images.pexels.com/photos/1313267/pexels-photo-1313267.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Guava", "https://images.pexels.com/photos/3283626/pexels-photo-3283626.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Pomegranate", "https://images.pexels.com/photos/1435740/pexels-photo-1435740.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Dragon Fruit", "https://images.pexels.com/photos/1435740/pexels-photo-1435740.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Pineapple", "https://images.pexels.com/photos/947883/pexels-photo-947883.jpeg?auto=compress&cs=tinysrgb&w=400");
+
+        nonUnsplashImages.put("Rice", "https://images.pexels.com/photos/4110251/pexels-photo-4110251.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Wheat", "https://images.pexels.com/photos/1070058/pexels-photo-1070058.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Foxtail Millet", "https://images.pexels.com/photos/59944/pexels-photo-59944.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Pearl Millet", "https://images.pexels.com/photos/59944/pexels-photo-59944.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Ragi", "https://images.pexels.com/photos/59944/pexels-photo-59944.jpeg?auto=compress&cs=tinysrgb&w=400");
+
+        nonUnsplashImages.put("Rajma", "https://images.pexels.com/photos/8926438/pexels-photo-8926438.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Green Gram", "https://images.pexels.com/photos/8926451/pexels-photo-8926451.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Black Gram", "https://images.pexels.com/photos/8926451/pexels-photo-8926451.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Toor Dal", "https://images.pexels.com/photos/8926438/pexels-photo-8926438.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Bengal Gram", "https://images.pexels.com/photos/8926438/pexels-photo-8926438.jpeg?auto=compress&cs=tinysrgb&w=400");
+
+        nonUnsplashImages.put("Turmeric", "https://images.pexels.com/photos/6154852/pexels-photo-6154852.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Black Pepper", "https://images.pexels.com/photos/5087370/pexels-photo-5087370.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Cardamom", "https://images.pexels.com/photos/5321326/pexels-photo-5321326.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Coriander Seeds", "https://images.pexels.com/photos/5967970/pexels-photo-5967970.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Cumin", "https://images.pexels.com/photos/6154852/pexels-photo-6154852.jpeg?auto=compress&cs=tinysrgb&w=400");
+
+        nonUnsplashImages.put("Milk", "https://images.pexels.com/photos/248412/pexels-photo-248412.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Paneer", "https://images.pexels.com/photos/12916867/pexels-photo-12916867.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Butter", "https://images.pexels.com/photos/920220/pexels-photo-920220.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Cheese", "https://images.pexels.com/photos/8213344/pexels-photo-8213344.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Honey", "https://images.pexels.com/photos/5870493/pexels-photo-5870493.jpeg?auto=compress&cs=tinysrgb&w=400");
+        nonUnsplashImages.put("Ghee", "https://images.pexels.com/photos/10118334/pexels-photo-10118334.jpeg?auto=compress&cs=tinysrgb&w=400");
+
+        int farmerIndex = 0;
+        int globalIndex = 0;
+
+        for (String[] catGroup : categoriesAndItems) {
+            String categoryName = catGroup[0];
+            for (int i = 1; i < catGroup.length; i++) {
+                String itemName = catGroup[i];
+                User farmer = farmers.get(farmerIndex % farmers.size());
+                farmerIndex++;
+                globalIndex++;
+
+                Farm farm = farmRepository.findByFarmerId(farmer.getId()).orElse(null);
+                String village = farm != null && farm.getVillage() != null ? farm.getVillage() : "Basinikonda Rural";
+                double distance = 1.2 + (globalIndex * 0.4) % 10.0;
+                double rating = 4.2 + (globalIndex % 8) * 0.1;
+                boolean organic = (globalIndex % 2 == 0) || categoryName.equals("Organic Products") || categoryName.equals("Herbs");
+
+                String imageUrl = nonUnsplashImages.getOrDefault(itemName, "https://images.pexels.com/photos/2286777/pexels-photo-2286777.jpeg?auto=compress&cs=tinysrgb&w=400");
+
+                Product p = Product.builder()
+                        .farmerId(farmer.getId())
+                        .farmerName(farmer.getName())
+                        .farmName(farmer.getFarmName())
+                        .name(itemName)
+                        .category(categoryName)
+                        .price(25.0 + (globalIndex * 5) % 150)
+                        .quantity(60 + (globalIndex * 12) % 200)
+                        .unit(categoryName.equals("Dairy") ? "litre" : "kg")
+                        .organic(organic)
+                        .rating(Math.min(5.0, Math.round(rating * 10.0) / 10.0))
+                        .reviewCount(10 + globalIndex * 2)
+                        .distance(Math.round(distance * 10.0) / 10.0)
+                        .harvestDate("2026-07-22")
+                        .freshness("High")
+                        .deliveryTime(globalIndex % 2 == 0 ? "2-4 hrs" : "Same Day")
+                        .description("Freshly harvested " + itemName + " directly from " + farmer.getFarmName() + ". 100% farm-fresh, chemical-free and organic.")
+                        .status("AVAILABLE")
+                        .isSeeded(true)
+                        .village(village)
+                        .verifiedFarmer(true)
+                        .image(imageUrl)
+                        .images(Arrays.asList(imageUrl))
+                        .build();
+
+                products.add(p);
+            }
+        }
+
+        productRepository.saveAll(products);
+        System.out.println("✅ Seeded " + products.size() + " default products cleanly into MongoDB!");
     }
 
     private User getOrCreateFarmer(String email, String name, String mobile, String farmName) {
@@ -221,7 +353,7 @@ public class DataInitializer implements CommandLineRunner {
                 .freshness("High")
                 .deliveryTime(idx % 2 == 0 ? "2-4 hrs" : "Same Day")
                 .description("Freshly harvested " + name + " directly from " + farmer.getFarmName() + ". 100% farm-fresh, pesticide-tested, and chemical-free.")
-                .status("Available")
+                .status("AVAILABLE")
                 .ordersReceived(5 + idx * 3)
                 .isSeeded(true)
                 .build();

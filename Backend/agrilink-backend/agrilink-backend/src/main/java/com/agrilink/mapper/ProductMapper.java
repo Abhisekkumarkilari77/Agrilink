@@ -36,6 +36,8 @@ public class ProductMapper {
                 .status(product.getStatus())
                 .ordersReceived(product.getOrdersReceived())
                 .reviews(reviewRepository.findByProductId(product.getId()))
+                .village(product.getVillage())
+                .verifiedFarmer(product.isVerifiedFarmer())
                 .build();
     }
 }

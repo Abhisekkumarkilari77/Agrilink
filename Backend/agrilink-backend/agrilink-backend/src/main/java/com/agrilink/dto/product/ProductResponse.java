@@ -31,4 +31,6 @@ public class ProductResponse {
     private String status;
     private int ordersReceived;
     private List<ProductReview> reviews;
+    private String village;
+    private boolean verifiedFarmer;
 }

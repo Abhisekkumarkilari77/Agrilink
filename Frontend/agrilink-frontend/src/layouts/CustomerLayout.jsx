@@ -15,7 +15,7 @@ const CustomerLayout = () => {
   const navLinks = [
     { label: 'Dashboard', path: '/customer/dashboard' },
     { label: 'Browse Products', path: '/customer/products' },
-    { label: 'Nearby Farmers', path: '/customer/products?nearby=true' },
+    { label: 'Nearby Farmers', path: '/customer/nearby-farmers' },
     { label: 'My Orders', path: '/customer/orders' },
     { label: 'Wishlist', path: '/customer/wishlist' },
     { label: 'Profile', path: '/customer/profile' },

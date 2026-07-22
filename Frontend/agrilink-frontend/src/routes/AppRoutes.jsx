@@ -33,6 +33,7 @@ import CurrentOrders from '../pages/customer/orders/CurrentOrders';
 import OrderHistory from '../pages/customer/orders/OrderHistory';
 import Wishlist from '../pages/customer/wishlist/Wishlist';
 import Profile from '../pages/customer/profile/Profile';
+import NearbyFarmers from '../pages/customer/products/NearbyFarmers';
 
 // Farmer Pages
 import FarmerDashboard from '../pages/farmer/dashboard/Dashboard';
@@ -108,6 +109,7 @@ const AppRoutes = () => {
         <Route path="order-history" element={<OrderHistory />} />
         <Route path="wishlist" element={<Wishlist />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="nearby-farmers" element={<NearbyFarmers />} />
       </Route>
 
       {/* Farmer Routes */}

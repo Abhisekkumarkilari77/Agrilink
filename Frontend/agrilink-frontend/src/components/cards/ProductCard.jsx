@@ -56,12 +56,17 @@ const ProductCard = ({ product, animDelay = 0 }) => {
         />
         <div className="absolute top-3 left-3 flex flex-col gap-1">
           {product.organic && (
-            <span className="bg-emerald-600 text-white text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm">
+            <span className="bg-emerald-600 text-white text-[8px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm">
               🌿 Organic
             </span>
           )}
+          {product.verifiedFarmer !== false && (
+            <span className="bg-blue-600 text-white text-[8px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm">
+              ✓ Verified Farmer
+            </span>
+          )}
           {product.discount > 0 && (
-            <span className="bg-red-500 text-white text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm">
+            <span className="bg-red-500 text-white text-[8px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm">
               {product.discount}% OFF
             </span>
           )}
@@ -85,11 +90,13 @@ const ProductCard = ({ product, animDelay = 0 }) => {
               ★ {product.rating || 4.5}
             </span>
           </div>
-          <p className="text-[11px] text-stone-400 font-medium mt-1">Farm: {product.farmName || product.farmerName || 'AgriLink Organic'}</p>
+          <p className="text-[11px] text-stone-500 font-bold mt-1">Farmer: {product.farmerName || 'Local Farmer'}</p>
+          <p className="text-[10px] text-stone-400 font-semibold mt-0.5">🏡 Village: {product.village || 'Basinikonda Rural'}</p>
+          <p className="text-[10px] text-emerald-600 font-extrabold mt-1">📦 Stock: {product.quantity || 50} {product.unit || 'kg'} available</p>
         </div>
 
-        <div className="flex items-center justify-between border-t border-stone-100 pt-3">
-          <div>
+        <div className="border-t border-stone-100 pt-3">
+          <div className="flex justify-between items-baseline mb-3">
             <div className="flex items-baseline space-x-1">
               <span className="text-base font-black text-stone-800">₹{product.price}</span>
               <span className="text-[10px] text-stone-400 font-bold">/ {product.unit || 'kg'}</span>
@@ -98,12 +105,25 @@ const ProductCard = ({ product, animDelay = 0 }) => {
               <p className="text-[9px] text-emerald-600 font-bold">🚚 {product.deliveryTime}</p>
             )}
           </div>
-          <button
-            onClick={handleAddToCart}
-            className="px-4 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl text-xs font-bold transition shadow-sm shadow-primary/15 btn-press"
-          >
-            Add to Cart
-          </button>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={handleAddToCart}
+              className="py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl text-xs font-bold transition btn-press border border-stone-200/50"
+            >
+              Add to Cart
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                addToCart(product, 1);
+                addToast(`${product.name} added! Proceeding to checkout.`, 'success');
+                navigate('/customer/cart');
+              }}
+              className="py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl text-xs font-bold transition shadow-sm shadow-primary/15 btn-press"
+            >
+              Buy Now
+            </button>
+          </div>
         </div>
       </div>
     </div>

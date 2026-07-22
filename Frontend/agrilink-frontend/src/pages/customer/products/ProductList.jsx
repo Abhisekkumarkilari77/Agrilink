@@ -14,7 +14,9 @@ const ProductList = () => {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState(searchParams.get('category') || 'All');
   const [organicOnly, setOrganicOnly] = useState(false);
-  const [maxPrice, setMaxPrice] = useState(500);
+  const [maxPrice, setMaxPrice] = useState(2000);
+  const [maxDistance, setMaxDistance] = useState(30);
+  const [minRating, setMinRating] = useState(0);
   const [sortBy, setSortBy] = useState('rating');
 
   const categories = [
@@ -59,6 +61,10 @@ const ProductList = () => {
     }
 
     result = result.filter(p => p.price <= maxPrice);
+    result = result.filter(p => (p.distance || 0) <= maxDistance);
+    if (minRating > 0) {
+      result = result.filter(p => p.rating >= minRating);
+    }
 
     if (sortBy === 'price-asc') {
       result.sort((a, b) => a.price - b.price);
@@ -71,7 +77,7 @@ const ProductList = () => {
     }
 
     return result;
-  }, [products, search, category, organicOnly, maxPrice, sortBy]);
+  }, [products, search, category, organicOnly, maxPrice, maxDistance, minRating, sortBy]);
 
   return (
     <div className="space-y-8">
@@ -115,22 +121,49 @@ const ProductList = () => {
           </div>
         </div>
 
-        {/* Detailed Slider & Checkbox */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-t border-stone-100 pt-4 gap-4">
-          <div className="flex items-center space-x-4 w-full sm:w-auto">
-            <span className="text-xs font-bold text-stone-500">Max Price: <span className="text-primary font-black">₹{maxPrice}</span></span>
+        {/* Detailed Sliders & Checkbox */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-center gap-6 border-t border-stone-100 pt-4">
+          <div className="flex items-center space-x-4">
+            <span className="text-xs font-bold text-stone-500 whitespace-nowrap">Max Price: <span className="text-primary font-black">₹{maxPrice}</span></span>
             <input
               type="range"
               min="10"
-              max="1000"
+              max="2000"
               step="10"
               value={maxPrice}
               onChange={(e) => setMaxPrice(Number(e.target.value))}
-              className="w-48 accent-primary cursor-pointer"
+              className="w-full accent-primary cursor-pointer"
             />
           </div>
 
-          <label className="flex items-center space-x-2.5 text-xs font-bold text-stone-600 cursor-pointer select-none group">
+          <div className="flex items-center space-x-4">
+            <span className="text-xs font-bold text-stone-500 whitespace-nowrap">Max Distance: <span className="text-primary font-black">{maxDistance} km</span></span>
+            <input
+              type="range"
+              min="1"
+              max="30"
+              step="1"
+              value={maxDistance}
+              onChange={(e) => setMaxDistance(Number(e.target.value))}
+              className="w-full accent-primary cursor-pointer"
+            />
+          </div>
+
+          <div className="flex items-center space-x-3">
+            <span className="text-xs font-bold text-stone-500 whitespace-nowrap">Min Rating:</span>
+            <select
+              value={minRating}
+              onChange={(e) => setMinRating(Number(e.target.value))}
+              className="px-3 py-1.5 rounded-xl border border-stone-200 bg-stone-50/50 text-xs font-bold text-stone-600 focus:outline-none cursor-pointer"
+            >
+              <option value={0}>All Ratings</option>
+              <option value={4}>★ 4.0 & above</option>
+              <option value={4.5}>★ 4.5 & above</option>
+              <option value={4.8}>★ 4.8 & above</option>
+            </select>
+          </div>
+
+          <label className="flex items-center space-x-2.5 text-xs font-bold text-stone-600 cursor-pointer select-none group justify-end">
             <input
               type="checkbox"
               checked={organicOnly}

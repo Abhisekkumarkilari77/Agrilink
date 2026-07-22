@@ -6,6 +6,8 @@ import com.agrilink.entity.auth.User;
 import com.agrilink.entity.product.Product;
 import com.agrilink.exception.ResourceNotFoundException;
 import com.agrilink.mapper.ProductMapper;
+import com.agrilink.entity.farmer.Farm;
+import com.agrilink.repository.FarmRepository;
 import com.agrilink.repository.ProductRepository;
 import com.agrilink.repository.UserRepository;
 import com.agrilink.response.ApiResponse;
@@ -22,12 +24,16 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final FarmRepository farmRepository;
     private final ProductMapper productMapper;
 
     @Override
     public ApiResponse<ProductResponse> createProduct(String farmerId, ProductRequest request) {
         User farmer = userRepository.findById(farmerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Farmer not found"));
+
+        Farm farm = farmRepository.findByFarmerId(farmerId).orElse(null);
+        String village = farm != null && farm.getVillage() != null ? farm.getVillage() : "Nelamangala";
 
         Product product = Product.builder()
                 .farmerId(farmerId)
@@ -40,6 +46,8 @@ public class ProductServiceImpl implements ProductService {
                 .organic(Boolean.TRUE.equals(request.getOrganic()))
                 .description(request.getDescription())
                 .image(request.getImage())
+                .village(village)
+                .verifiedFarmer(true)
                 .build();
 
         product = productRepository.save(product);

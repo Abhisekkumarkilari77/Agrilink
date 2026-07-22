@@ -47,6 +47,7 @@ const StatCard = ({ label, value, icon, color, delay }) => {
 };
 
 import productService from '../../../services/productService';
+import ProductCard from '../../../components/cards/ProductCard';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -116,7 +117,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {[
             { label: 'Browse Products', path: '/customer/products', icon: '🛒' },
-            { label: 'Nearby Farmers', path: '/customer/products?nearby=true', icon: '📍' },
+            { label: 'Nearby Farmers', path: '/customer/nearby-farmers', icon: '📍' },
             { label: 'My Orders', path: '/customer/orders', icon: '📦' },
             { label: 'Wishlist', path: '/customer/wishlist', icon: '❤️' },
             { label: 'Cart', path: '/customer/cart', icon: '🛍️' },
@@ -179,57 +180,60 @@ const Dashboard = () => {
       </div>
 
       {/* 6. Live Products Collections from MongoDB */}
-      <div className="bg-white rounded-3xl p-6 border border-stone-100 shadow-sm space-y-6 animate-fadeIn" style={{ animationDelay: '0.4s' }}>
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-bold text-stone-800 flex items-center gap-2">
-            <span>✨</span> Active Harvest Listings
-          </h3>
-          <button 
-            onClick={() => navigate('/customer/products')}
-            className="text-xs font-black text-primary hover:underline"
-          >
-            View All ({liveProducts.length})
-          </button>
-        </div>
+      {(() => {
+        const featured = liveProducts.filter(p => p.rating >= 4.7).slice(0, 50);
+        const latest = [...liveProducts].reverse().slice(0, 50);
+        const organic = liveProducts.filter(p => p.organic).slice(0, 50);
+        const nearby = [...liveProducts].sort((a, b) => (a.distance || 0) - (b.distance || 0)).slice(0, 50);
+        const recommended = liveProducts.filter(p => p.rating >= 4.5).slice(0, 50);
+        const trending = [...liveProducts].sort((a, b) => (b.ordersReceived || 0) - (a.ordersReceived || 0)).slice(0, 50);
 
-        {liveProducts.length === 0 ? (
-          <div className="text-center py-12 bg-stone-50 rounded-2xl border border-stone-100">
-            <span className="text-4xl block animate-bounce">🌾</span>
-            <p className="text-stone-500 font-bold text-xs mt-3">No Products Available</p>
-          </div>
-        ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {liveProducts.slice(0, 4).map((product, idx) => (
-              <div 
-                key={product.id || idx}
-                onClick={() => navigate(`/customer/products`)}
-                className="bg-stone-50/50 hover:bg-white border border-stone-100 hover:border-primary/20 rounded-2xl p-4 cursor-pointer transition duration-200 card-hover flex flex-col justify-between space-y-3"
+        const collections = [
+          { title: '🌟 Featured Products', data: featured },
+          { title: '📅 Latest Products', data: latest },
+          { title: '🌿 Organic Products', data: organic },
+          { title: '📍 Nearby Products', data: nearby },
+          { title: '👍 Recommended Products', data: recommended },
+          { title: '🔥 Trending Products', data: trending }
+        ];
+
+        return (
+          <div className="space-y-8">
+            {collections.map((col, cIdx) => (
+              <div
+                key={cIdx}
+                className="bg-white rounded-3xl p-6 border border-stone-100 shadow-sm space-y-6 animate-fadeIn"
+                style={{ animationDelay: `${0.4 + cIdx * 0.05}s` }}
               >
-                <div className="relative h-32 bg-stone-100 rounded-xl overflow-hidden">
-                  <img 
-                    src={product.image} 
-                    alt={product.name} 
-                    className="w-full h-full object-cover" 
-                  />
-                  {product.organic && (
-                    <span className="absolute top-2 left-2 bg-emerald-600 text-white text-[8px] font-black uppercase px-2 py-0.5 rounded-full">
-                      🌿 Organic
-                    </span>
-                  )}
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-bold text-stone-800 flex items-center gap-2">
+                    {col.title}
+                  </h3>
+                  <button
+                    onClick={() => navigate('/customer/products')}
+                    className="text-xs font-black text-primary hover:underline"
+                  >
+                    View All ({col.data.length})
+                  </button>
                 </div>
-                <div>
-                  <h4 className="font-extrabold text-xs text-stone-800 line-clamp-1">{product.name}</h4>
-                  <p className="text-[10px] text-stone-400 font-bold mt-1 line-clamp-1">🌾 {product.farmName || 'Verified Farmer'}</p>
-                </div>
-                <div className="flex justify-between items-center border-t border-stone-100/60 pt-2 text-xs">
-                  <span className="font-black text-stone-800">₹{product.price}<span className="text-[9px] text-stone-400 font-medium">/{product.unit || 'kg'}</span></span>
-                  <span className="text-[10px] text-amber-500 font-bold">★ {product.rating || 4.5}</span>
-                </div>
+
+                {col.data.length === 0 ? (
+                  <div className="text-center py-12 bg-stone-50 rounded-2xl border border-stone-100">
+                    <span className="text-4xl block animate-bounce">🌾</span>
+                    <p className="text-stone-500 font-bold text-xs mt-3">No Products Available</p>
+                  </div>
+                ) : (
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {col.data.map((product, idx) => (
+                      <ProductCard key={product.id || idx} product={product} animDelay={idx * 0.03} />
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>
-        )}
-      </div>
+        );
+      })()}
 
       {/* 7. Popular Categories with Icons */}
       <div className="bg-white rounded-3xl p-6 border border-stone-100 shadow-sm animate-fadeIn" style={{ animationDelay: '0.45s' }}>

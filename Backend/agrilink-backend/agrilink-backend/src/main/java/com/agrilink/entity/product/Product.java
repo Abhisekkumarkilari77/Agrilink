@@ -53,7 +53,7 @@ public class Product {
     private String image;
 
     @Builder.Default
-    private String status = "Available";
+    private String status = "AVAILABLE";
 
     @Builder.Default
     private int ordersReceived = 0;
@@ -79,6 +79,11 @@ public class Product {
     private Instant updatedAt;
     @Builder.Default
     private Boolean isSeeded = false;
+    
+    private String village;
+    
+    @Builder.Default
+    private boolean verifiedFarmer = true;
 
     public void setImageUrl(String imageUrl) {
         this.image = imageUrl;

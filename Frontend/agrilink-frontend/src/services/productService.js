@@ -923,7 +923,7 @@ export const productService = {
         const prodList = response.data.data || response.data;
         if (Array.isArray(prodList)) {
           // Filter to show active/available products, excluding DELETED, OUT_OF_STOCK, DISABLED
-          return prodList.filter(p => p.status === 'AVAILABLE' || p.status === 'ACTIVE' || !p.status);
+          return prodList.filter(p => p.status === 'AVAILABLE' || p.status === 'ACTIVE' || p.status === 'Available' || !p.status);
         }
         return prodList;
       }
