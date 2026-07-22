@@ -148,9 +148,7 @@
 				<configuration>
 					<source>21</source>
 					<target>21</target>
-					<fork>true</fork>
-					<meminitial>64m</meminitial>
-					<maxmem>256m</maxmem>
+					<fork>false</fork>
 					<annotationProcessorPaths>
 						<path>
 							<groupId>org.projectlombok</groupId>
