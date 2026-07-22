@@ -153,10 +153,10 @@ const Login = () => {
         <div className="mt-5 p-4 bg-stone-50 rounded-2xl text-center text-[10px] text-stone-400 border border-stone-100 animate-fadeIn stagger-5">
           <p className="font-bold mb-1.5 uppercase tracking-wider text-stone-500">Testing Credentials</p>
           <div className="space-y-0.5">
-            <p>Customer: customer@agrilink.com | password</p>
-            <p>Farmer: farmer@agrilink.com | password</p>
-            <p>Delivery: delivery@agrilink.com | password</p>
-            <p>Admin: admin1@agrilink.com | password123</p>
+            <p>Admin: admin@agrilink.com | admin123</p>
+            <p>Super Admin: superadmin@agrilink.com | superadmin123</p>
+            <p>Farmer: farmer@agrilink.com | farmer123</p>
+            <p>Delivery: delivery@agrilink.com | delivery123</p>
           </div>
         </div>
       </div>
