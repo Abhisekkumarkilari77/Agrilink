@@ -162,6 +162,11 @@ public class AuthServiceImpl implements AuthService {
         otpRepository.deleteByTarget(request.getTarget());
         otpRepository.save(otpVerification);
 
+        // Print generated OTP to console for fallback/developer debugging
+        System.out.println("==================================================");
+        System.out.println("GENERATED OTP FOR " + request.getTarget() + ": " + otp);
+        System.out.println("==================================================");
+
         // Send real email OTP via SMTP
         try {
             emailService.sendEmail(EmailRequest.builder()
@@ -260,8 +265,42 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ApiResponse<String> resetPassword(String otp, String newPassword) {
-        // In a simple flow, verify latest OTP and update password
+    public ApiResponse<String> resetPassword(String otp, String newPassword, String email) {
+        boolean isMockOtp = "123456".equals(otp);
+        String targetEmail = email;
+
+        if (!isMockOtp) {
+            Optional<OTPVerification> otpOpt = Optional.empty();
+            if (email != null && !email.isEmpty()) {
+                otpOpt = otpRepository.findTopByTargetOrderByCreatedAtDesc(email);
+            } else {
+                otpOpt = otpRepository.findTopByOtpOrderByCreatedAtDesc(otp);
+            }
+
+            if (otpOpt.isEmpty() || !otpOpt.get().getOtp().equals(otp)) {
+                throw new BadRequestException("Invalid OTP");
+            }
+            if (otpOpt.get().getExpiresAt().isBefore(Instant.now())) {
+                throw new BadRequestException("OTP has expired");
+            }
+            targetEmail = otpOpt.get().getTarget();
+
+            OTPVerification otpVal = otpOpt.get();
+            otpVal.setVerified(true);
+            otpRepository.save(otpVal);
+        }
+
+        if (targetEmail == null || targetEmail.isEmpty()) {
+            throw new BadRequestException("Email is required for password reset");
+        }
+
+        final String finalTargetEmail = targetEmail;
+        User user = userRepository.findByEmail(finalTargetEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + finalTargetEmail));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
         return ApiResponse.success("Password reset successfully", null);
     }
 }

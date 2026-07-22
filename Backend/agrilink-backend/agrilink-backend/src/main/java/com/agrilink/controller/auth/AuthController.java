@@ -57,7 +57,10 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<ApiResponse<String>> resetPassword(@RequestParam String otp, @RequestParam String newPassword) {
-        return ResponseEntity.ok(authService.resetPassword(otp, newPassword));
+    public ResponseEntity<ApiResponse<String>> resetPassword(
+            @RequestParam String otp,
+            @RequestParam String newPassword,
+            @RequestParam(required = false) String email) {
+        return ResponseEntity.ok(authService.resetPassword(otp, newPassword, email));
     }
 }

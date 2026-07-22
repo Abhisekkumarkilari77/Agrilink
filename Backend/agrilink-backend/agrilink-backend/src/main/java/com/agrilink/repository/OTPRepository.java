@@ -10,5 +10,6 @@ import java.util.Optional;
 public interface OTPRepository extends MongoRepository<OTPVerification, String> {
     Optional<OTPVerification> findByTargetAndVerifiedFalse(String target);
     Optional<OTPVerification> findTopByTargetOrderByCreatedAtDesc(String target);
+    Optional<OTPVerification> findTopByOtpOrderByCreatedAtDesc(String otp);
     void deleteByTarget(String target);
 }

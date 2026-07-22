@@ -16,5 +16,5 @@ public interface AuthService {
     
     ApiResponse<User> getCurrentUser();
     ApiResponse<String> forgotPassword(String email);
-    ApiResponse<String> resetPassword(String otp, String newPassword);
+    ApiResponse<String> resetPassword(String otp, String newPassword, String email);
 }

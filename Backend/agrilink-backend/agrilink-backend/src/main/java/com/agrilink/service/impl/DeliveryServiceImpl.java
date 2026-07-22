@@ -132,6 +132,11 @@ public class DeliveryServiceImpl implements DeliveryService {
             Optional<User> farmerOpt = userRepository.findById(order.getFarmerId());
             if (farmerOpt.isPresent()) {
                 User farmer = farmerOpt.get();
+                // Print generated OTP to console for fallback/developer debugging
+                System.out.println("==================================================");
+                System.out.println("GENERATED PICKUP OTP FOR ORDER " + orderId + " (FARMER " + farmer.getEmail() + "): " + otp);
+                System.out.println("==================================================");
+
                 emailService.sendEmail(EmailRequest.builder()
                         .to(farmer.getEmail())
                         .subject("Your Farm Package Pickup Verification OTP")
