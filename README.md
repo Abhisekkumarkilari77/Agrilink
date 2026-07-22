@@ -22,34 +22,49 @@
 ```powershell
 git clone https://github.com/Abhisekkumarkilari77/Agrilink.git
 cd Agrilink
-```
+`Here is a complete list of commands to run the project from a fresh clone, followed by the issues we solved and the commands used to resolve them:
 
-#### Step B: Start Local MongoDB
+---
+
+### 🚀 Complete Commands to Run From Clone
+
+#### 1. Start MongoDB (Prerequisite)
+Ensure MongoDB is running locally on port `27017`:
 ```powershell
 net start MongoDB
 ```
 
-#### Step C: Backend Setup & Launch (Rebuilds `target/`)
-Open **Terminal Window #1**:
+#### 2. Backend Setup & Run
+Run these commands from the root directory of the cloned repository:
 ```powershell
+# Navigate to the backend folder
 cd Backend\agrilink-backend\agrilink-backend
+
+# Clean target and compile code
+mvn clean compile
+
+# Start the Spring Boot Application
 mvn spring-boot:run
 ```
-> 📌 *On startup, the backend automatically seeds initial Admin, Super Admin, Farmer, Delivery Partner, Categories, and Products into MongoDB.*
+* The backend will run on `http://localhost:8085/api`.
+* On startup, the database seeder will automatically initialize categories, users, and 50 default products.
 
-- **Backend API Base URL:** `http://localhost:8080/api`
-- **Swagger Documentation:** `http://localhost:8080/api/swagger-ui.html`
-
-#### Step D: Frontend Setup & Launch (Installs `node_modules/`)
-Open **Terminal Window #2**:
+#### 3. Frontend Setup & Run
+Open a new terminal window at the repository root:
 ```powershell
+# Navigate to the frontend folder
 cd Frontend\agrilink-frontend
+
+# Install node dependencies
 npm install
+
+# Run the local Vite dev server
 npm run dev
 ```
-- **Frontend App URL:** `http://localhost:5173`
+* The frontend application will run on `http://localhost:5173`.
 
 ---
+
 
 ## 🔑 Complete Seeded Account Credentials
 
