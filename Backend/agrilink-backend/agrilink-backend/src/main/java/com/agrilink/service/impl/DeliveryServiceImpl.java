@@ -19,6 +19,7 @@ import com.agrilink.repository.UserRepository;
 import com.agrilink.response.ApiResponse;
 import com.agrilink.service.DeliveryService;
 import com.agrilink.service.EmailService;
+import com.agrilink.service.SmsService;
 import com.agrilink.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,7 @@ public class DeliveryServiceImpl implements DeliveryService {
     private final DeliveryAssignmentRepository deliveryAssignmentRepository;
     private final UserRepository userRepository;
     private final EmailService emailService;
+    private final SmsService smsService;
 
     @Override
     public ApiResponse<OrderResponse> acceptOrder(String deliveryPartnerId, String orderId) {
@@ -141,9 +143,14 @@ public class DeliveryServiceImpl implements DeliveryService {
                                 "Thank You.")
                         .build());
                 System.out.println("Farmer Pickup OTP email sent to: " + farmer.getEmail());
+
+                // Also send Twilio SMS OTP to farmer if mobile number is present
+                if (farmer.getMobile() != null && !farmer.getMobile().trim().isEmpty()) {
+                    smsService.sendSms(farmer.getMobile(), "Hello " + farmer.getName() + ", your AgriLink Pickup Verification OTP is: " + otp + ". Share this code with the driver to hand over your crops.");
+                }
             }
         } catch (Exception e) {
-            System.err.println("Failed to send Farmer Pickup OTP email: " + e.getMessage());
+            System.err.println("Failed to send Farmer Pickup OTP: " + e.getMessage());
         }
 
         return ApiResponse.success("Pickup OTP generated and sent to farmer successfully.", orderMapper.toResponse(order));

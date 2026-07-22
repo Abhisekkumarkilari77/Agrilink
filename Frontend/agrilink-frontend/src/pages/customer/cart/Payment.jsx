@@ -41,6 +41,8 @@ const Payment = () => {
 
     setLoading(true);
     try {
+      const user = JSON.parse(localStorage.getItem('agrilink_user') || '{}');
+
       // 1. Create Order
       const order = await orderService.createOrder({
         items: details.items,
@@ -50,28 +52,82 @@ const Payment = () => {
         total: details.total
       });
 
-      // 2. Initiate Payment Transaction
-      const transactionId = 'TXN' + Math.floor(100000 + Math.random() * 900000);
+      // 2. Initiate Payment Transaction (Backend returns Razorpay Order ID as transactionId)
       const payment = await paymentService.initiatePayment({
         orderId: order.id,
         amount: details.total,
         method: details.paymentMethod,
-        transactionId: transactionId
+        transactionId: ''
       });
 
-      // 3. Mark online payment as SUCCESS to transition order to CONFIRMED
+      // 3. Mark payment status or launch Razorpay modal
       if (details.paymentMethod !== 'COD') {
-        await paymentService.updatePaymentStatus(payment.id, 'SUCCESS');
-      }
+        const loadScript = () => {
+          return new Promise((resolve) => {
+            if (window.Razorpay) {
+              resolve(true);
+              return;
+            }
+            const script = document.createElement('script');
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+          });
+        };
 
-      clearCart();
-      sessionStorage.removeItem('agrilink_checkout_details');
-      sessionStorage.setItem('agrilink_last_order', JSON.stringify(order));
-      navigate('/customer/order-success');
+        const sdkLoaded = await loadScript();
+        if (!sdkLoaded) {
+          throw new Error('Could not load payment checkout SDK.');
+        }
+
+        const options = {
+          key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_dummy_key_id',
+          amount: Math.round(details.total * 100),
+          currency: 'INR',
+          name: 'AgriLink',
+          description: 'Payment for fresh farm products',
+          order_id: payment.transactionId,
+          handler: async (response) => {
+            setLoading(true);
+            try {
+              await paymentService.updatePaymentStatus(payment.id, 'SUCCESS');
+              clearCart();
+              sessionStorage.removeItem('agrilink_checkout_details');
+              sessionStorage.setItem('agrilink_last_order', JSON.stringify(order));
+              navigate('/customer/order-success');
+            } catch (err) {
+              alert('Payment succeeded but verification failed. Contact support.');
+            } finally {
+              setLoading(false);
+            }
+          },
+          prefill: {
+            name: user.name || '',
+            email: user.email || '',
+            contact: user.mobile || ''
+          },
+          theme: {
+            color: '#f59e0b',
+          },
+          modal: {
+            ondismiss: function() {
+              setLoading(false);
+            }
+          }
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+      } else {
+        clearCart();
+        sessionStorage.removeItem('agrilink_checkout_details');
+        sessionStorage.setItem('agrilink_last_order', JSON.stringify(order));
+        navigate('/customer/order-success');
+      }
     } catch (err) {
       console.error(err);
-      setError('Payment transaction failed. Please check inputs.');
-    } finally {
+      setError(err.message || 'Payment transaction failed. Please check inputs.');
       setLoading(false);
     }
   };

@@ -40,32 +40,96 @@ const RouteNavigation = () => {
         </button>
       </div>
 
-      {/* Mock Map Layout */}
-      <div className="w-full h-64 bg-gray-100 rounded-2xl relative overflow-hidden flex items-center justify-center border border-gray-200">
-        {/* Simple mock map drawing */}
-        <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]"></div>
-        
-        {/* Custom mock map details */}
-        <div className="absolute top-8 left-12 flex flex-col items-center">
-          <div className="w-8 h-8 rounded-full bg-yellow-500 text-white flex items-center justify-center font-bold text-xs shadow">Driver</div>
-          <span className="text-[9px] font-bold text-gray-500 mt-1">My Location</span>
-        </div>
+  const [mapLoaded, setMapLoaded] = useState(false);
 
-        <div className="absolute top-24 right-16 flex flex-col items-center">
-          <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center font-bold text-xs shadow">Farm</div>
-          <span className="text-[9px] font-bold text-gray-500 mt-1">{order?.farmName}</span>
-        </div>
+  useEffect(() => {
+    // Dynamically load Leaflet CSS & JS
+    if (!document.getElementById('leaflet-css')) {
+      const link = document.createElement('link');
+      link.id = 'leaflet-css';
+      link.rel = 'stylesheet';
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+      document.head.appendChild(link);
+    }
 
-        <div className="absolute bottom-12 left-24 flex flex-col items-center">
-          <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-xs shadow">Cust</div>
-          <span className="text-[9px] font-bold text-gray-500 mt-1">{order?.customerName}</span>
-        </div>
+    if (!document.getElementById('leaflet-js')) {
+      const script = document.createElement('script');
+      script.id = 'leaflet-js';
+      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      script.onload = () => setMapLoaded(true);
+      document.body.appendChild(script);
+    } else {
+      setMapLoaded(true);
+    }
+  }, []);
 
-        {/* Drawn mock paths */}
-        <div className="w-24 h-1 border-t-2 border-dashed border-gray-400 absolute top-16 left-20 rotate-12"></div>
-        <div className="w-32 h-1 border-t-2 border-dashed border-gray-400 absolute top-36 right-24 -rotate-45"></div>
+  useEffect(() => {
+    if (!mapLoaded || !order || !window.L) return;
 
-        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest relative z-10">Google Maps Mock View</span>
+    // Initialize Leaflet Map centered around Bengaluru (or mock locations)
+    const map = window.L.map('leaflet-map-container').setView([12.9716, 77.5946], 12);
+
+    window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Add Driver Marker (Bengaluru Center)
+    const driverIcon = window.L.divIcon({
+      className: 'custom-div-icon',
+      html: "<div class='w-7 h-7 rounded-full bg-yellow-500 text-white flex items-center justify-center font-bold text-[10px] border border-white shadow-md'>🚗</div>",
+      iconSize: [28, 28]
+    });
+    window.L.marker([12.9716, 77.5946], { icon: driverIcon }).addTo(map).bindPopup('My Location (Driver)').openPopup();
+
+    // Add Farm Marker (Random offset)
+    const farmIcon = window.L.divIcon({
+      className: 'custom-div-icon',
+      html: "<div class='w-7 h-7 rounded-full bg-green-600 text-white flex items-center justify-center font-bold text-[10px] border border-white shadow-md'>🏡</div>",
+      iconSize: [28, 28]
+    });
+    window.L.marker([12.9916, 77.6146], { icon: farmIcon }).addTo(map).bindPopup(order.farmName || 'Farmer Pickup Location');
+
+    // Add Customer Marker (Random offset)
+    const custIcon = window.L.divIcon({
+      className: 'custom-div-icon',
+      html: "<div class='w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-[10px] border border-white shadow-md'>👤</div>",
+      iconSize: [28, 28]
+    });
+    window.L.marker([12.9516, 77.5746], { icon: custIcon }).addTo(map).bindPopup(order.customerName || 'Customer Delivery Location');
+
+    // Draw route line
+    const latlngs = [
+      [12.9716, 77.5946],
+      [12.9916, 77.6146],
+      [12.9516, 77.5746]
+    ];
+    window.L.polyline(latlngs, { color: '#f59e0b', weight: 4, dashArray: '8, 8' }).addTo(map);
+
+    return () => {
+      map.remove();
+    };
+  }, [mapLoaded, order]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-24">
+        <span className="w-10 h-10 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"></span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-3xl border border-gray-150 p-6 max-w-xl mx-auto shadow-sm space-y-6">
+      <div className="flex justify-between items-center border-b pb-4">
+        <h2 className="text-xl font-bold text-gray-800">Live GPS Route Map</h2>
+        <button onClick={() => navigate(-1)} className="text-xs font-bold text-gray-500 hover:underline">
+          ← Back
+        </button>
+      </div>
+
+      {/* Real Interactive Leaflet Map Container */}
+      <div id="leaflet-map-container" className="w-full h-80 bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden shadow-inner relative z-0">
+        {!mapLoaded && <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-gray-400">Loading Map View...</span>}
       </div>
 
       {/* Navigation directions */}

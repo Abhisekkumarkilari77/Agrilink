@@ -16,6 +16,7 @@ import com.agrilink.security.CustomUserDetails;
 import com.agrilink.exception.UnauthorizedException;
 import com.agrilink.dto.EmailRequest;
 import com.agrilink.service.EmailService;
+import com.agrilink.service.SmsService;
 import com.agrilink.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,6 +42,7 @@ public class AuthServiceImpl implements AuthService {
     private final OTPRepository otpRepository;
     private final UserMapper userMapper;
     private final EmailService emailService;
+    private final SmsService smsService;
 
     @Override
     public ApiResponse<JwtAuthenticationResponse> login(LoginRequest request) {
@@ -158,6 +160,18 @@ public class AuthServiceImpl implements AuthService {
         } catch (Exception e) {
             System.err.println("Failed to send real SMTP OTP email: " + e.getMessage());
             e.printStackTrace();
+        }
+
+        // Also send Twilio SMS OTP if mobile is available or target is a mobile number
+        try {
+            Optional<User> userOpt = userRepository.findByEmail(request.getTarget());
+            if (userOpt.isPresent() && userOpt.get().getMobile() != null) {
+                smsService.sendSms(userOpt.get().getMobile(), "Your AgriLink verification code is: " + otp + ". Valid for 10 minutes.");
+            } else if (request.getTarget() != null && request.getTarget().matches("\\+?\\d{10,15}")) {
+                smsService.sendSms(request.getTarget(), "Your AgriLink verification code is: " + otp + ". Valid for 10 minutes.");
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to send Twilio SMS OTP: " + e.getMessage());
         }
 
         return ApiResponse.success("OTP sent successfully", null);

@@ -11,6 +11,7 @@ import com.agrilink.repository.PaymentRepository;
 import com.agrilink.response.ApiResponse;
 import com.agrilink.service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
@@ -24,10 +25,38 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
 
+    @Value("${razorpay.key-id:}")
+    private String keyId;
+
+    @Value("${razorpay.key-secret:}")
+    private String keySecret;
+
     @Override
     public ApiResponse<PaymentResponse> initiatePayment(PaymentRequest request) {
         Order order = orderRepository.findById(request.getOrderId())
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+
+        String transactionId = request.getTransactionId();
+        
+        // If live keys are configured, generate a real Razorpay Order
+        if (keyId != null && !keyId.trim().isEmpty() && keySecret != null && !keySecret.trim().isEmpty()) {
+            try {
+                com.razorpay.RazorpayClient client = new com.razorpay.RazorpayClient(keyId, keySecret);
+                org.json.JSONObject orderRequest = new org.json.JSONObject();
+                orderRequest.put("amount", (int) (request.getAmount() * 100)); // amount in paise
+                orderRequest.put("currency", "INR");
+                orderRequest.put("receipt", order.getId());
+                
+                com.razorpay.Order gatewayOrder = client.orders.create(orderRequest);
+                transactionId = gatewayOrder.get("id");
+            } catch (Exception e) {
+                System.err.println("Razorpay initiation failed, falling back to mock details: " + e.getMessage());
+            }
+        }
+
+        if (transactionId == null || transactionId.trim().isEmpty()) {
+            transactionId = "mock_tx_" + System.currentTimeMillis();
+        }
 
         Payment payment = Payment.builder()
                 .orderId(order.getId())
@@ -35,7 +64,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .amount(request.getAmount())
                 .method(request.getMethod())
                 .status(PaymentStatus.PENDING)
-                .transactionId(request.getTransactionId())
+                .transactionId(transactionId)
                 .build();
 
         payment = paymentRepository.save(payment);
