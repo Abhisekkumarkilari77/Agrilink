@@ -127,11 +127,24 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private void validateNewUser(String email, String mobile) {
-        if (userRepository.existsByEmail(email)) {
-            throw new BadRequestException("Email already in use");
+        Optional<User> existingByEmail = userRepository.findByEmail(email);
+        if (existingByEmail.isPresent()) {
+            User existing = existingByEmail.get();
+            if (existing.getStatus() == AccountStatus.ACTIVE) {
+                throw new BadRequestException("Email already registered. Please login.");
+            } else if (existing.getStatus() == AccountStatus.PENDING) {
+                userRepository.delete(existing);
+            }
         }
-        if (userRepository.existsByMobile(mobile)) {
-            throw new BadRequestException("Mobile number already in use");
+
+        Optional<User> existingByMobile = userRepository.findByMobile(mobile);
+        if (existingByMobile.isPresent()) {
+            User existing = existingByMobile.get();
+            if (existing.getStatus() == AccountStatus.ACTIVE) {
+                throw new BadRequestException("Mobile number already registered. Please login.");
+            } else if (existing.getStatus() == AccountStatus.PENDING) {
+                userRepository.delete(existing);
+            }
         }
     }
 

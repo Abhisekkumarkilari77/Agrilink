@@ -58,7 +58,7 @@ const Register = () => {
       sessionStorage.setItem('agrilink_otp_target', custForm.email);
       navigate('/verify-otp');
     } catch (err) {
-      setError(err.message);
+      setError(err?.message || 'Registration failed. Please check your inputs and try again.');
     } finally {
       setLoading(false);
     }
@@ -72,7 +72,7 @@ const Register = () => {
       sessionStorage.setItem('agrilink_otp_target', farmerForm.email);
       navigate('/verify-otp');
     } catch (err) {
-      setError(err.message);
+      setError(err?.message || 'Registration failed. Please check your inputs and try again.');
     } finally {
       setLoading(false);
     }
@@ -86,7 +86,7 @@ const Register = () => {
       sessionStorage.setItem('agrilink_otp_target', deliveryForm.email);
       navigate('/verify-otp');
     } catch (err) {
-      setError(err.message);
+      setError(err?.message || 'Registration failed. Please check your inputs and try again.');
     } finally {
       setLoading(false);
     }
