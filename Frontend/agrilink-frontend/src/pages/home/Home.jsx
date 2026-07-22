@@ -190,7 +190,7 @@ const Home = () => {
         prod.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (prod.farmerName && prod.farmerName.toLowerCase().includes(searchQuery.toLowerCase()));
 
-      const matchCategory = selectedCategory === 'All' || prod.category === selectedCategory;
+      const matchCategory = selectedCategory === 'All' || prod.category.toLowerCase().includes(selectedCategory.toLowerCase()) || selectedCategory.toLowerCase().includes(prod.category.toLowerCase()) || (selectedCategory === 'Vegetables' && prod.category === 'Vegetables');
       const matchOrganic = !organicOnly || prod.organic;
       const matchPrice = prod.price <= maxPrice;
       const matchRating = (prod.rating || 4.0) >= minRating;
