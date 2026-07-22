@@ -178,6 +178,27 @@ export const farmerService = {
       return { message: 'Withdrawal request submitted to admin for verification.' };
     }
     return { message: 'Withdrawal request submitted' };
+  },
+
+  uploadProductImage: async (file) => {
+    if (MOCK_MODE) {
+      await new Promise(resolve => setTimeout(resolve, 600));
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          resolve({ imageUrl: reader.result });
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await axiosInstance.post('/uploads/product-image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
   }
 };
 
