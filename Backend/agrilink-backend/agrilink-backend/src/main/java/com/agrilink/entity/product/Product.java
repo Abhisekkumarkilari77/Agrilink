@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
+import java.util.List;
 
 @Data
 @Builder
@@ -79,9 +80,9 @@ public class Product {
     private Instant updatedAt;
     @Builder.Default
     private Boolean isSeeded = false;
-    
+
     private String village;
-    
+
     @Builder.Default
     private boolean verifiedFarmer = true;
 
