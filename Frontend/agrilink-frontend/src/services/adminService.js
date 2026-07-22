@@ -51,12 +51,8 @@ export const adminService = {
         ]
       };
     }
-    return {
-      users: { farmers: 0, verifiedFarmers: 0, pendingFarmers: 0, customers: 0, delivery: 0, pendingDelivery: 0 },
-      marketplace: { productsListed: 0, ordersToday: 0, activeDeliveries: 0, completedOrders: 0, cancelledOrders: 0 },
-      revenue: { today: 0, weekly: 0, monthly: 0, commission: 0 },
-      notifications: []
-    };
+    const response = await axiosInstance.get('/admin/dashboard');
+    return response.data.data || response.data;
   },
 
   getUsers: async () => {

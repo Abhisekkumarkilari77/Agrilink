@@ -11,4 +11,5 @@ public interface AdminService {
     
     ApiResponse<User> approveUser(String userId);
     ApiResponse<User> rejectUser(String userId, String reason);
+    ApiResponse<java.util.Map<String, Object>> getDashboardData();
 }

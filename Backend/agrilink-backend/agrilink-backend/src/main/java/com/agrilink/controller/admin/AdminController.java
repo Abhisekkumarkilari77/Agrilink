@@ -37,4 +37,9 @@ public class AdminController {
     public ResponseEntity<ApiResponse<User>> rejectUser(@PathVariable String userId, @RequestParam(required = false) String reason) {
         return ResponseEntity.ok(adminService.rejectUser(userId, reason));
     }
+
+    @GetMapping("/dashboard")
+    public ResponseEntity<ApiResponse<java.util.Map<String, Object>>> getDashboardData() {
+        return ResponseEntity.ok(adminService.getDashboardData());
+    }
 }
