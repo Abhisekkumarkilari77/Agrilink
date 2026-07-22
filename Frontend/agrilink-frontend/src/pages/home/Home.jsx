@@ -33,9 +33,9 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [organicOnly, setOrganicOnly] = useState(false);
-  const [maxPrice, setMaxPrice] = useState(500);
+  const [maxPrice, setMaxPrice] = useState(1500);
   const [minRating, setMinRating] = useState(0);
-  const [maxDistance, setMaxDistance] = useState(15);
+  const [maxDistance, setMaxDistance] = useState(25);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
   const [listening, setListening] = useState(false);
@@ -625,15 +625,15 @@ const Home = () => {
               <input
                 type="range"
                 min="10"
-                max="500"
-                step="5"
+                max="1500"
+                step="10"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(Number(e.target.value))}
                 className="w-full accent-[#16A34A] cursor-pointer"
               />
               <div className="flex justify-between text-[10px] text-slate-400 font-bold">
                 <span>₹10</span>
-                <span>₹500</span>
+                <span>₹1500</span>
               </div>
             </div>
 
