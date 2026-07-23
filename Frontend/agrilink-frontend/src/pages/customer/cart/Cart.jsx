@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../../../context/CartContext';
+import ProductImage from '../../../components/common/ProductImage';
 
 const Cart = () => {
   const { cart, updateQuantity, removeFromCart, getCartTotal, clearCart } = useCart();
@@ -43,7 +44,7 @@ const Cart = () => {
           {cart.map((item) => (
             <div key={item.product.id} className="p-4 border border-gray-150 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gray-50/20">
               <div className="flex items-center space-x-4">
-                <img src={item.product.image} alt={item.product.name} className="w-16 h-16 rounded-xl object-cover bg-gray-100" />
+                <ProductImage src={item.product.image || item.product.imageUrl} name={item.product.name} category={item.product.category} alt={item.product.name} className="w-16 h-16 rounded-xl object-cover bg-gray-100" />
                 <div>
                   <h4 className="font-bold text-gray-800">{item.product.name}</h4>
                   <p className="text-xs text-gray-400">By {item.product.farmerName}</p>

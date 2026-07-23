@@ -735,6 +735,8 @@ const Home = () => {
                   >
                     <ProductImage
                       src={product.image}
+                      name={product.name}
+                      category={product.category}
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
@@ -934,7 +936,13 @@ const Home = () => {
 
             <div className="flex flex-col md:flex-row gap-6">
               <div className="w-full md:w-1/2 h-52 bg-slate-50 rounded-2xl overflow-hidden">
-                <img src={quickViewProduct.image} alt={quickViewProduct.name} className="w-full h-full object-cover" />
+                <ProductImage
+                  src={quickViewProduct.image || quickViewProduct.imageUrl}
+                  name={quickViewProduct.name}
+                  category={quickViewProduct.category}
+                  alt={quickViewProduct.name}
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="flex-1 space-y-4">
                 <div className="flex justify-between items-start gap-2">

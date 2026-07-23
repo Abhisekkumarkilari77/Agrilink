@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import productService from '../../../services/productService';
 import { useCart } from '../../../context/CartContext';
+import ProductImage from '../../../components/common/ProductImage';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -49,7 +50,7 @@ const ProductDetails = () => {
       <div className="bg-white rounded-3xl p-6 border border-gray-150 shadow-sm grid md:grid-cols-2 gap-8">
         {/* Left: Image */}
         <div className="h-96 rounded-2xl overflow-hidden bg-gray-100 relative">
-          <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+          <ProductImage src={product.image || product.imageUrl} name={product.name} category={product.category} alt={product.name} className="w-full h-full object-cover" />
           {product.organic && (
             <span className="absolute top-4 left-4 bg-green-600 text-white text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full">
               Organic

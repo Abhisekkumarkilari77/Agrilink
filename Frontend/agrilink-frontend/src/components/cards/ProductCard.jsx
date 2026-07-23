@@ -50,8 +50,10 @@ const ProductCard = ({ product, animDelay = 0 }) => {
         onClick={() => navigate(`/customer/products/${product.id}`)}
       >
         <ProductImage
-          src={product.image}
+          src={product.image || product.imageUrl}
           alt={product.name}
+          name={product.name}
+          category={product.category}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-3 left-3 flex flex-col gap-1">

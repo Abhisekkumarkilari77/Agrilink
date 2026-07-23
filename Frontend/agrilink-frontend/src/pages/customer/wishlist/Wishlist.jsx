@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useWishlist } from '../../../context/WishlistContext';
 import { useCart } from '../../../context/CartContext';
 import { useToast } from '../../../context/ToastContext';
+import ProductImage from '../../../components/common/ProductImage';
 
 const Wishlist = () => {
   const navigate = useNavigate();
@@ -52,8 +53,10 @@ const Wishlist = () => {
             <div key={item.id} className="bg-white rounded-3xl border border-stone-150 p-5 shadow-sm space-y-4 flex flex-col justify-between card-hover animate-fadeIn">
               <div className="space-y-3">
                 <div className="flex items-center space-x-3">
-                  <img
-                    src={item.image}
+                  <ProductImage
+                    src={item.image || item.imageUrl}
+                    name={item.name}
+                    category={item.category}
                     alt={item.name}
                     className="w-20 h-20 rounded-2xl object-cover border border-stone-100 cursor-pointer"
                     onClick={() => navigate(`/customer/products/${item.id}`)}

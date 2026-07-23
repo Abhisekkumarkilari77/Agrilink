@@ -1,4 +1,22 @@
 import axiosInstance, { MOCK_MODE } from '../api/axiosConfig';
+import { getAccurateProductImage } from '../utils/productImageHelper';
+
+const normalizeProductImage = (product) => {
+  if (!product) return product;
+
+  return {
+    ...product,
+    image: getAccurateProductImage(
+      product.name,
+      product.category,
+      product.image || product.imageUrl || ''
+    )
+  };
+};
+
+const normalizeProductImages = (products) => (
+  Array.isArray(products) ? products.map(normalizeProductImage) : products
+);
 
 const MOCK_PRODUCTS = [
   // 1. Vegetables (15 Items)
@@ -289,7 +307,7 @@ const MOCK_PRODUCTS = [
     harvestDate: '2026-07-22',
     freshness: 'Excellent',
     description: 'Sweet, naturally ripened Banginapalli mangoes direct from Horsley Hills orchards.',
-    image: 'https://images.pexels.com/photos/2290293/pexels-photo-2290293.jpeg?auto=compress&cs=tinysrgb&w=400',
+    image: 'https://images.unsplash.com/photo-1553279768-865429fa0078?w=500&q=80',
     reviews: []
   },
   {
@@ -438,7 +456,7 @@ const MOCK_PRODUCTS = [
   },
   {
     id: 'prod-25',
-    name: 'Organic Lemons (Pack of 6)',
+    name: 'Organic water Lemons (Pack of 6)',
     farmerName: 'Reddy Prasad',
     farmerId: 'f-1',
     farmName: 'Madanapalle Tomato Hub',
@@ -507,7 +525,7 @@ const MOCK_PRODUCTS = [
     harvestDate: '2026-07-18',
     freshness: 'High',
     description: 'Traditionally churned Vedic Bilona A2 cow ghee from local cows.',
-    image: 'https://images.pexels.com/photos/10118334/pexels-photo-10118334.jpeg?auto=compress&cs=tinysrgb&w=400',
+    image: 'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=500&q=80',
     reviews: []
   },
   {
@@ -640,7 +658,7 @@ const MOCK_PRODUCTS = [
   },
   {
     id: 'prod-36',
-    name: 'Finger Millet (Ragi)',
+    name: 'Finger Millet (Ragi,nuts)',
     farmerName: 'Kishore Kumar',
     farmerId: 'f-4',
     farmName: 'Ananthapuram Paddy Fields',
@@ -743,7 +761,7 @@ const MOCK_PRODUCTS = [
     harvestDate: '2026-07-02',
     freshness: 'High',
     description: 'Premium unpolished Toor Dal split yellow pigeon peas.',
-    image: 'https://images.pexels.com/photos/8926438/pexels-photo-8926438.jpeg?auto=compress&cs=tinysrgb&w=400',
+    image: 'https://pixabay.com/photos/dal-toor-dal-toor-asian-india-1740205/',
     reviews: []
   },
   {
@@ -912,58 +930,62 @@ const MOCK_PRODUCTS = [
     image: 'https://images.pexels.com/photos/973226/pexels-photo-973226.jpeg?auto=compress&cs=tinysrgb&w=400',
     reviews: []
   }
-];
+].map(normalizeProductImage);
 
 export const productService = {
   getProducts: async () => {
     try {
       const response = await axiosInstance.get('/products');
       // If response is valid, return the active / available products from MongoDB
-      if (response && response.data) {
-        const prodList = response.data.data || response.data;
-        if (Array.isArray(prodList)) {
-          // Filter to show active/available products, excluding DELETED, OUT_OF_STOCK, DISABLED
-          return prodList.filter(p => p.status === 'AVAILABLE' || p.status === 'ACTIVE' || p.status === 'Available' || !p.status);
+        if (response && response.data) {
+          const prodList = response.data.data || response.data;
+          if (Array.isArray(prodList)) {
+            // Filter to show active/available products, excluding DELETED, OUT_OF_STOCK, DISABLED
+            return normalizeProductImages(
+              prodList.filter(p => p.status === 'AVAILABLE' || p.status === 'ACTIVE' || p.status === 'Available' || !p.status)
+            );
+          }
+          return normalizeProductImage(prodList);
         }
-        return prodList;
+      } catch (err) {
+        console.warn('Backend products fetch failed, using fallback mock list', err);
       }
-    } catch (err) {
-      console.warn('Backend products fetch failed, using fallback mock list', err);
-    }
-    // Fallback Mock List
-    return MOCK_PRODUCTS;
-  },
+      // Fallback Mock List
+      return normalizeProductImages(MOCK_PRODUCTS);
+    },
 
   getProductById: async (id) => {
     try {
       const response = await axiosInstance.get(`/products/${id}`);
       if (response && response.data) {
-        return response.data.data || response.data;
+          return normalizeProductImage(response.data.data || response.data);
       }
     } catch (err) {
       console.warn('Backend get product by id failed, searching fallback list', err);
     }
-    const product = MOCK_PRODUCTS.find(p => p.id === id);
-    if (product) return product;
-    throw new Error('Product not found');
-  },
+      const product = MOCK_PRODUCTS.find(p => p.id === id);
+      if (product) return normalizeProductImage(product);
+      throw new Error('Product not found');
+    },
 
   searchProducts: async (query) => {
     try {
-      const response = await axiosInstance.get(`/products/search?query=${query}`);
-      if (response && response.data) {
-        return response.data.data || response.data;
+        const response = await axiosInstance.get(`/products/search?query=${query}`);
+        if (response && response.data) {
+          return normalizeProductImages(response.data.data || response.data);
+        }
+      } catch (err) {
+        console.warn('Backend search failed, filtering fallback list', err);
       }
-    } catch (err) {
-      console.warn('Backend search failed, filtering fallback list', err);
+      const term = query.toLowerCase();
+      return normalizeProductImages(
+        MOCK_PRODUCTS.filter(p => 
+          p.name.toLowerCase().includes(term) || 
+          p.category.toLowerCase().includes(term) ||
+          p.farmerName.toLowerCase().includes(term)
+        )
+      );
     }
-    const term = query.toLowerCase();
-    return MOCK_PRODUCTS.filter(p => 
-      p.name.toLowerCase().includes(term) || 
-      p.category.toLowerCase().includes(term) ||
-      p.farmerName.toLowerCase().includes(term)
-    );
-  }
-};
+  };
 
 export default productService;
