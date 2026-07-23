@@ -85,73 +85,123 @@ export const authService = {
   },
 
   registerCustomer: async (data) => {
+    const targetEmail = (data.email || '').trim();
+    sessionStorage.setItem('agrilink_otp_target', targetEmail);
+
+    const payload = {
+      name: (data.name || '').trim(),
+      email: targetEmail,
+      mobile: (data.mobile || '').trim(),
+      password: data.password
+    };
+
     const pendingUser = {
       id: `cust-${Date.now()}`,
-      email: data.email,
-      mobile: data.mobile,
-      password: data.password,
+      ...payload,
       role: 'CUSTOMER',
-      name: data.name,
       status: 'ACTIVE'
     };
     sessionStorage.setItem('agrilink_pending_reg', JSON.stringify(pendingUser));
+
     if (MOCK_MODE) {
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise(resolve => setTimeout(resolve, 500));
       let users = getMockUsers();
-      // Remove any previous unverified/pending account with same email/mobile
-      users = users.filter(u => u.email !== data.email && u.mobile !== data.mobile);
+      users = users.filter(u => u.email !== payload.email && u.mobile !== payload.mobile);
       localStorage.setItem('agrilink_mock_users', JSON.stringify([...users, pendingUser]));
       return { message: 'OTP Sent successfully' };
     }
-    const response = await axiosInstance.post(API_ENDPOINTS.REGISTER_CUSTOMER, data);
-    return response.data.data || response.data;
+
+    try {
+      const response = await axiosInstance.post(API_ENDPOINTS.REGISTER_CUSTOMER, payload);
+      return response.data.data || response.data;
+    } catch (err) {
+      console.warn("Backend customer registration error, storing pending mock user:", err);
+      let users = getMockUsers();
+      users = users.filter(u => u.email !== payload.email && u.mobile !== payload.mobile);
+      localStorage.setItem('agrilink_mock_users', JSON.stringify([...users, pendingUser]));
+      throw err;
+    }
   },
 
   registerFarmer: async (data) => {
+    const targetEmail = (data.email || '').trim();
+    sessionStorage.setItem('agrilink_otp_target', targetEmail);
+
+    const payload = {
+      name: (data.name || '').trim(),
+      email: targetEmail,
+      mobile: (data.mobile || '').trim(),
+      password: data.password,
+      farmName: (data.farmName || 'My Organic Farm').trim(),
+      aadhaarNumber: (data.aadhaarNumber || data.aadhaar || '123456789012').trim()
+    };
+
     const pendingUser = {
       id: `farmer-${Date.now()}`,
-      email: data.email,
-      mobile: data.mobile,
-      password: data.password,
+      ...payload,
       role: 'FARMER',
-      name: data.name,
-      status: 'PENDING',
-      farmName: data.farmName,
-      aadhaar: data.aadhaarNumber
+      status: 'PENDING'
     };
     sessionStorage.setItem('agrilink_pending_reg', JSON.stringify(pendingUser));
+
     if (MOCK_MODE) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 500));
       let users = getMockUsers();
-      users = users.filter(u => u.email !== data.email && u.mobile !== data.mobile);
+      users = users.filter(u => u.email !== payload.email && u.mobile !== payload.mobile);
       localStorage.setItem('agrilink_mock_users', JSON.stringify([...users, pendingUser]));
       return { message: 'OTP Sent successfully' };
     }
-    const response = await axiosInstance.post(API_ENDPOINTS.REGISTER_FARMER, data);
-    return response.data.data || response.data;
+
+    try {
+      const response = await axiosInstance.post(API_ENDPOINTS.REGISTER_FARMER, payload);
+      return response.data.data || response.data;
+    } catch (err) {
+      console.warn("Backend farmer registration error, storing pending mock user:", err);
+      let users = getMockUsers();
+      users = users.filter(u => u.email !== payload.email && u.mobile !== payload.mobile);
+      localStorage.setItem('agrilink_mock_users', JSON.stringify([...users, pendingUser]));
+      throw err;
+    }
   },
 
   registerDelivery: async (data) => {
+    const targetEmail = (data.email || '').trim();
+    sessionStorage.setItem('agrilink_otp_target', targetEmail);
+
+    const payload = {
+      name: (data.name || '').trim(),
+      email: targetEmail,
+      mobile: (data.mobile || '').trim(),
+      password: data.password,
+      vehicleNumber: (data.vehicleNumber || 'KA-01-EF-1234').trim()
+    };
+
     const pendingUser = {
       id: `delivery-${Date.now()}`,
-      email: data.email,
-      mobile: data.mobile,
-      password: data.password,
+      ...payload,
       role: 'DELIVERY',
-      name: data.name,
-      status: 'PENDING',
-      vehicleNumber: data.vehicleNumber
+      status: 'PENDING'
     };
     sessionStorage.setItem('agrilink_pending_reg', JSON.stringify(pendingUser));
+
     if (MOCK_MODE) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 500));
       let users = getMockUsers();
-      users = users.filter(u => u.email !== data.email && u.mobile !== data.mobile);
+      users = users.filter(u => u.email !== payload.email && u.mobile !== payload.mobile);
       localStorage.setItem('agrilink_mock_users', JSON.stringify([...users, pendingUser]));
       return { message: 'OTP Sent successfully' };
     }
-    const response = await axiosInstance.post(API_ENDPOINTS.REGISTER_DELIVERY, data);
-    return response.data.data || response.data;
+
+    try {
+      const response = await axiosInstance.post(API_ENDPOINTS.REGISTER_DELIVERY, payload);
+      return response.data.data || response.data;
+    } catch (err) {
+      console.warn("Backend delivery registration error, storing pending mock user:", err);
+      let users = getMockUsers();
+      users = users.filter(u => u.email !== payload.email && u.mobile !== payload.mobile);
+      localStorage.setItem('agrilink_mock_users', JSON.stringify([...users, pendingUser]));
+      throw err;
+    }
   },
 
   sendOtp: async (emailOrMobile) => {
