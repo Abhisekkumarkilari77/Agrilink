@@ -66,32 +66,25 @@ npm run dev
 ---
 
 
-## 🔑 Complete Seeded Account Credentials
-
-| Role | Name | Email / Username | Password | Status |
-| :--- | :--- | :--- | :--- | :--- |
-| **Admin** | AgriLink Admin | `admin@agrilink.com` | `admin123` | `ACTIVE` |
-| **Super Admin** | System Super Admin | `superadmin@agrilink.com` | `superadmin123` | `ACTIVE` |
-| **Farmer** | Rajesh Kumar | `farmer@agrilink.com` | `farmer123` | `ACTIVE` |
-| **Delivery Partner** | Ravi Kumar | `delivery@agrilink.com` | `delivery123` | `ACTIVE` |
+##Here are all the pre-seeded account credentials for the **AgriLink** application:
 
 ---
 
-## 🚀 Key Features & Workflows Included
+### 🔑 **Pre-Seeded Login Credentials**
 
-1. **Multi-Role Authentication**:
-   - Customer, Farmer, and Delivery Partner registration & stateless JWT login.
-   - universal test OTP **`123456`** for dev testing.
+| Role | Name | Email / Username | Password | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **Super Admin** | System Super Admin | `superadmin@agrilink.com` | `superadmin123` | Active |
+| **Admin** | AgriLink Admin | `admin@agrilink.com` | `admin123` | Active |
+| **Farmer** | Rajesh Kumar | `farmer@agrilink.com` | `farmer123` | Active |
+| **Delivery Partner** | Ravi Kumar | `delivery@agrilink.com` | `delivery123` | Active |
+| **Customer** | Abhisek Kundu | `customer@agrilink.com` | `password` | Active |
 
-2. **Admin Verification System**:
-   - `GET /api/admin/pending-farmers` & `GET /api/admin/pending-delivery-partners`.
-   - `PUT /api/admin/users/{userId}/approve` to activate pending accounts.
+---
 
-3. **Farmer Product Management**:
-   - Add, edit, delete, and list products by category or farmer ID.
-   - Pre-seeded with 6 categories (*Vegetables, Fruits, Dairy, Grains, Flowers, Eggs*).
+### ⚡ **Additional Test Details**
 
-4. **Order Logistics & Live OTP Delivery**:
-   - Customers place orders stored directly in MongoDB.
-   - Delivery partners accept orders via `/api/delivery/{partnerId}/accept/{orderId}`.
-   - Pickup OTP verification (`/verify-pickup`) and Dropoff OTP verification (`/verify-delivery`).
+- **Universal Test OTP:** `123456` *(works for all OTP verification prompts)*
+- **Frontend App:** [http://localhost:5173/](http://localhost:5173/) (or `http://localhost:5174/`)
+- **Backend API:** [http://localhost:8085/api](http://localhost:8085/api)
+- **Swagger API Documentation:** [http://localhost:8085/api/swagger-ui.html](http://localhost:8085/api/swagger-ui.html)
