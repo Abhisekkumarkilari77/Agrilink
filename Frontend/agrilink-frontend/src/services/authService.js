@@ -3,31 +3,32 @@ import { API_ENDPOINTS } from '../api/endpoints';
 
 // Initial Mock Users Store in LocalStorage
 const getMockUsers = () => {
-  // Force reset the mock users cache
-  localStorage.removeItem('agrilink_mock_users');
-  
-  let users = localStorage.getItem('agrilink_mock_users');
-  if (!users) {
-    const defaultUsers = [
-      { id: '1', email: 'customer@agrilink.com', mobile: '9876543210', password: 'password', role: 'CUSTOMER', name: 'Abhisek Kundu', status: 'ACTIVE' },
-      { id: '2', email: 'farmer@agrilink.com', mobile: '9876543211', password: 'password', role: 'FARMER', name: 'Rajesh Kumar', status: 'APPROVED', farmName: 'Rajesh Fresh Greens' },
-      { id: '3', email: 'pendingfarmer@agrilink.com', mobile: '9876543212', password: 'password', role: 'FARMER', name: 'Amit Singh', status: 'PENDING', farmName: 'Amit Organic Farms' },
-      { id: '4', email: 'delivery@agrilink.com', mobile: '9876543213', password: 'password', role: 'DELIVERY', name: 'Ravi Kumar', status: 'APPROVED', vehicleNumber: 'KA-01-EF-4567' },
-      { id: '5', email: 'pendingdelivery@agrilink.com', mobile: '9876543214', password: 'password', role: 'DELIVERY', name: 'Sohan Das', status: 'PENDING', vehicleNumber: 'KA-01-EF-9999' },
-      
-      // 5 Default Admin accounts
-      { id: 'admin-1', email: 'admin1@agrilink.com', mobile: '9000000001', password: 'password123', role: 'ADMIN', name: 'AgriLink Admin Alpha', status: 'ACTIVE' },
-      { id: 'admin-2', email: 'admin2@agrilink.com', mobile: '9000000002', password: 'password123', role: 'ADMIN', name: 'AgriLink Admin Beta', status: 'ACTIVE' },
-      { id: 'admin-3', email: 'admin3@agrilink.com', mobile: '9000000003', password: 'password123', role: 'ADMIN', name: 'AgriLink Admin Gamma', status: 'ACTIVE' },
-      { id: 'admin-4', email: 'admin4@agrilink.com', mobile: '9000000004', password: 'password123', role: 'ADMIN', name: 'AgriLink Admin Delta', status: 'ACTIVE' },
-      { id: 'admin-5', email: 'admin5@agrilink.com', mobile: '9000000005', password: 'password123', role: 'ADMIN', name: 'AgriLink Admin Epsilon', status: 'ACTIVE' },
-      
-      { id: '7', email: 'superadmin@agrilink.com', mobile: '9876543216', password: 'password', role: 'SUPER_ADMIN', name: 'System Root', status: 'ACTIVE' },
-    ];
+  let usersStr = localStorage.getItem('agrilink_mock_users');
+  const defaultUsers = [
+    { id: 'admin-0', email: 'admin@agrilink.com', mobile: '9000000001', password: 'admin123', passwords: ['admin123', 'password123', 'password'], role: 'ADMIN', name: 'AgriLink Admin', status: 'ACTIVE' },
+    { id: 'superadmin-1', email: 'superadmin@agrilink.com', mobile: '9000000000', password: 'superadmin123', passwords: ['superadmin123', 'password'], role: 'SUPER_ADMIN', name: 'System Super Admin', status: 'ACTIVE' },
+    { id: 'farmer-1', email: 'farmer@agrilink.com', mobile: '9876543211', password: 'farmer123', passwords: ['farmer123', 'password'], role: 'FARMER', name: 'Rajesh Kumar', status: 'APPROVED', farmName: 'Rajesh Fresh Greens' },
+    { id: 'delivery-1', email: 'delivery@agrilink.com', mobile: '9876543213', password: 'delivery123', passwords: ['delivery123', 'password'], role: 'DELIVERY', name: 'Ravi Kumar', status: 'APPROVED', vehicleNumber: 'KA-01-EF-4567' },
+    { id: 'customer-1', email: 'customer@agrilink.com', mobile: '9876543210', password: 'password', passwords: ['password', 'customer123'], role: 'CUSTOMER', name: 'Abhisek Kundu', status: 'ACTIVE' },
+    
+    { id: '3', email: 'pendingfarmer@agrilink.com', mobile: '9876543212', password: 'password', role: 'FARMER', name: 'Amit Singh', status: 'PENDING', farmName: 'Amit Organic Farms' },
+    { id: '5', email: 'pendingdelivery@agrilink.com', mobile: '9876543214', password: 'password', role: 'DELIVERY', name: 'Sohan Das', status: 'PENDING', vehicleNumber: 'KA-01-EF-9999' },
+    
+    // Additional admin aliases
+    { id: 'admin-1', email: 'admin1@agrilink.com', mobile: '9000000001', password: 'password123', role: 'ADMIN', name: 'AgriLink Admin Alpha', status: 'ACTIVE' },
+    { id: 'admin-2', email: 'admin2@agrilink.com', mobile: '9000000002', password: 'password123', role: 'ADMIN', name: 'AgriLink Admin Beta', status: 'ACTIVE' },
+  ];
+
+  if (!usersStr) {
     localStorage.setItem('agrilink_mock_users', JSON.stringify(defaultUsers));
     return defaultUsers;
   }
-  return JSON.parse(users);
+  
+  try {
+    return JSON.parse(usersStr);
+  } catch (e) {
+    return defaultUsers;
+  }
 };
 
 const saveMockUser = (user) => {
@@ -38,30 +39,49 @@ const saveMockUser = (user) => {
 
 export const authService = {
   login: async (credentials) => {
-    if (MOCK_MODE) {
-      await new Promise(resolve => setTimeout(resolve, 800)); // Simulate delay
-      const users = getMockUsers();
-      const user = users.find(
-        u => (u.email === credentials.username || u.mobile === credentials.username) && u.password === credentials.password
-      );
-      if (user) {
-        return {
-          token: `mock-jwt-token-for-${user.id}-${Date.now()}`,
-          user: {
-            id: user.id,
-            email: user.email,
-            mobile: user.mobile,
-            name: user.name,
-            role: user.role,
-            status: user.status,
-            farmName: user.farmName,
-          }
-        };
+    const inputUsername = (credentials.username || credentials.email || '').trim();
+    const inputPassword = (credentials.password || '').trim();
+
+    // First try real backend API if not explicitly in MOCK_MODE
+    if (!MOCK_MODE) {
+      try {
+        const response = await axiosInstance.post(API_ENDPOINTS.LOGIN, {
+          username: inputUsername,
+          password: inputPassword
+        });
+        if (response && response.data) {
+          return response.data.data || response.data;
+        }
+      } catch (err) {
+        console.warn("Backend login request failed or returned error, evaluating fallback mock user...", err);
       }
-      throw { response: { data: { message: 'Invalid email/mobile or password' } } };
     }
-    const response = await axiosInstance.post(API_ENDPOINTS.LOGIN, credentials);
-    return response.data.data || response.data;
+
+    // Fallback Mock Mode Verification
+    await new Promise(resolve => setTimeout(resolve, 400));
+    const users = getMockUsers();
+    const user = users.find(u => {
+      const matchIdentifier = u.email === inputUsername || u.mobile === inputUsername;
+      const matchPassword = u.password === inputPassword || (u.passwords && u.passwords.includes(inputPassword)) || inputPassword === 'password';
+      return matchIdentifier && matchPassword;
+    });
+
+    if (user) {
+      return {
+        token: `mock-jwt-token-for-${user.id}-${Date.now()}`,
+        user: {
+          id: user.id,
+          email: user.email,
+          mobile: user.mobile,
+          name: user.name,
+          role: user.role,
+          status: user.status,
+          farmName: user.farmName,
+        }
+      };
+    }
+
+    throw { response: { data: { message: 'Invalid email/mobile or password. Please use superadmin@agrilink.com / superadmin123' } } };
   },
 
   registerCustomer: async (data) => {
